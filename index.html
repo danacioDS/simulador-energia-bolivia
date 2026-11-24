@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulador energético Bolivia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE work: technical scenario model for a national energy crisis
+   IDEA an engineering datasheet / dispatch bulletin, gas-flame cobalt
+   PICTURE the national gas balance: supply mass shrinking under a rising demand line, deficit in red
+   COLOUR white ground, cobalt flame, pale cobalt zones, Bolivian red for deficit, amber for imports
+   TYPE Space Grotesk 600 + Inter
+   LAYOUT cobalt title strip; chart + KPI column beside controls; below, power and fuels side by side, then table */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0a0d18);--ink:light-dark(#0b1020,#e8ecff);--mute:light-dark(#4a5170,#9aa3c7);--zone:light-dark(#eef2ff,#141a33);--line:light-dark(#d5dcf5,#27305a);--co:#1240e0;--co2:light-dark(#7d97ff,#5c7bff);--red:#d52b1e;--amb:#f08a00;--hyd:light-dark(#0f8b8d,#2bb5b7);--sol:#e8b400}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3,.kv b{font-family:"Space Grotesk",Inter,sans-serif;letter-spacing:-.02em}
+.band{padding:clamp(22px,3vw,44px) max(5vw,16px)}
+.strip{background:#1240e0;color:#fff;padding-block:22px}
+.strip h1{margin:0;font-size:clamp(28px,4vw,44px);line-height:1.05;text-wrap:balance;max-width:24ch}
+.strip p{margin:8px 0 0;max-width:70ch;color:#dbe3ff}
+.wrap{max-width:1240px;margin:0 auto}
+.top{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px}
+.fig{position:relative;min-height:360px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+svg text{font:13px Inter,sans-serif;fill:var(--mute);paint-order:stroke;stroke:var(--bg);stroke-width:4px}
+svg .lab{fill:var(--ink);font-weight:600}
+h2{font-size:24px;line-height:1.1;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 12px;font-size:15px}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:14px}
+.kv{background:var(--bg);padding:10px 12px}
+.kv b{display:block;font-size:clamp(20px,2.4vw,28px);line-height:1.1;white-space:nowrap}
+.kv span{font-size:13px;color:var(--mute)}
+.kv.bad b{color:var(--red)}
+.panel{background:var(--zone);padding:16px;border:1px solid var(--line)}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+button{font:600 14px Inter,sans-serif;min-height:40px;padding:0 12px;border:1px solid var(--co);background:var(--bg);color:var(--ink);cursor:pointer}
+button[aria-pressed=true]{background:var(--co);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--amb);outline-offset:2px}
+.ctl{margin:10px 0}
+.ctl label{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:500}
+.ctl output{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--co2);font-weight:600}
+input[type=range]{width:100%;accent-color:#1240e0;height:28px}
+select{font:16px Inter,sans-serif;width:100%;min-height:40px;background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+.ctl small{display:block;color:var(--mute);font-size:13px;line-height:1.35}
+fieldset{border:0;border-top:1px solid var(--line);padding:8px 0 0;margin:12px 0 0}
+legend{font:600 14px "Space Grotesk",sans-serif;padding-right:6px}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px}.chk input{width:20px;height:20px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
+.key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--mute);margin:6px 0}
+.key i{display:inline-block;width:12px;height:12px;margin-right:5px;vertical-align:-1px}
+.alt{background:var(--zone)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;font-size:13px;color:var(--mute);vertical-align:bottom;white-space:normal}
+td.neg{color:var(--red);font-weight:600}
+.notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
+.notes ul{padding-left:18px;margin:6px 0}.notes li{margin:4px 0}
+a{color:var(--co2)}
+.foot{padding-block:20px}
+.foot p{margin:0;max-width:none}
+.foot .f1{font:600 15px "Space Grotesk",Inter,sans-serif;color:#fff}
+.foot .f2{font-size:14px;color:#dbe3ff;margin-top:4px}
+.seg{display:flex;gap:6px;margin:4px 0 6px}
+@media(max-width:900px){.top{grid-template-columns:minmax(0,1fr)}.two,.notes{grid-template-columns:minmax(0,1fr)}}
+.top .fig{min-height:470px}
+@media(max-width:600px){.fig,.top .fig{min-height:300px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}table{font-size:13px}th,td{padding:6px 4px}}
+@media(prefers-reduced-motion:no-preference){svg path.m{transition:d .35s ease}}
+</style>
+</head>
+<body>
+<header class="band strip"><div class="wrap">
+<h1 id="headline">Bolivia: el gas deja de alcanzar para el mercado interno</h1>
+<p>Modelo anual 2026–2040 que encadena la declinación de los campos de gas con la generación eléctrica, la importación de combustibles y la disponibilidad de divisas. Mueva los supuestos para ver cuándo y cuánto falta.</p>
+</div></header>
+
+<section class="band"><div class="wrap top">
+<div>
+<h2>Balance nacional de gas natural</h2>
+<p class="sub">Millones de m³ por día (MMm³/d). Oferta por fuente frente a la demanda interna; en rojo, gas que no llega.</p>
+<div class="key" id="k1"></div>
+<div class="fig"><svg id="g1" role="img" aria-label="Balance de gas por año"></svg></div>
+<div class="kpis" id="kpis"></div>
+</div>
+<aside class="panel" aria-label="Supuestos del escenario">
+<div class="presets" id="presets"></div>
+<div id="ctls"></div>
+<label class="chk"><input type="checkbox" id="imp" checked> Permitir importar gas (p. ej. desde Argentina)</label>
+<div class="ctl"><button id="reset" type="button">Restablecer escenario</button></div>
+</aside>
+</div></section>
+
+<section class="band alt"><div class="wrap two">
+<div>
+<h2 id="h2e">Generación eléctrica</h2>
+<p class="sub">TWh por año. La térmica depende del gas disponible; lo que no se cubre es energía no servida (racionamiento).</p>
+<div class="key" id="k2"></div>
+<div class="fig"><svg id="g2" role="img" aria-label="Generación eléctrica por fuente"></svg></div>
+</div>
+<div>
+<h2 id="h2f">Combustibles líquidos</h2>
+<p class="sub">Millones de litros por día. Producción nacional, importación y faltante cuando no alcanzan las divisas.</p>
+<div class="seg"><button type="button" id="bD" aria-pressed="true">Diésel</button><button type="button" id="bG" aria-pressed="false">Gasolina</button></div>
+<div class="key" id="k3"></div>
+<div class="fig"><svg id="g3" role="img" aria-label="Abastecimiento de combustible"></svg></div>
+</div>
+</div></section>
+
+<section class="band"><div class="wrap">
+<h2>Resultados año por año</h2>
+<p class="sub">Escenario activo. Montos en millones de US$ corrientes de supuesto.</p>
+<div class="scroll"><table id="tbl"></table></div>
+</div></section>
+
+<section class="band alt"><div class="wrap notes">
+<div>
+<h2>Cómo funciona el modelo</h2>
+<ul>
+<li><b>Gas.</b> Los campos existentes declinan a la tasa elegida y no pueden producir más rápido que reservas/5 años (relación R/P mínima). Nuevos hallazgos entran en rampa de 3 años, meseta de 5 y luego declinan 8 % anual.</li>
+<li><b>Prioridad.</b> El gas cubre primero el mercado interno; las exportaciones son el saldo, hasta el tope contractual. Si falta gas se importa (si se permite y hay divisas); el déficit restante se raciona en proporción entre termoeléctricas y el resto (industria, GNV, redes).</li>
+<li><b>Electricidad.</b> Demanda crece a la tasa elegida. Hidro (ajustada por hidrología) y renovables entran primero; la térmica cubre el resto con ~0,32 mil millones de m³ por TWh, reducible con eficiencia (ciclos combinados).</li>
+<li><b>Combustibles.</b> La refinación nacional sigue la producción de condensado, que cae con el gas. Lo demás se importa. Si la factura energética supera las divisas disponibles (más los ingresos por exportar gas), todas las importaciones se recortan en la misma proporción.</li>
+<li><b>Invierno.</b> En época seca la demanda interna de gas sube ~12 % (menos hidro, más térmica). El primer año en que eso supera la oferta marca el inicio probable de cortes estacionales.</li>
+</ul>
+</div>
+<div>
+<h2>Datos de partida (2025–2026)</h2>
+<ul>
+<li>Producción de gas ~25 MMm³/d a inicios de 2026, frente a ~61 en 2014 (Correo del Sur, Fundación Jubileo).</li>
+<li>Reservas al cierre de 2025: 1P 2,30 TCF; 2P 2,76; 3P 3,24 (certificación GLJ, YPFB).</li>
+<li>Mercado interno ~15 MMm³/d; exportación a Brasil 7–8 MMm³/d (YPFB, jul. 2026). Termoeléctricas ~6,5 MMm³/d de promedio anual.</li>
+<li>Electricidad: ~60–70 % térmica a gas; ~27–32 % hidro; demanda máxima ~1.800 MW (CNDC, CBE).</li>
+<li>Combustibles: ~200 millones de L/mes de diésel y ~140 de gasolina; se importa ~90 % del diésel y ~56 % de la gasolina (YPFB, ago. 2026).</li>
+<li>Advertencias públicas: importación de gas entre 2028 y 2031 (CBHE, Jubileo, YPFB).</li>
+</ul>
+<p class="sub">Modelo simplificado con fines de análisis de escenarios, no un pronóstico oficial. Precios, divisas y crecimiento son supuestos editables; los valores de calibración son aproximados.</p>
+</div>
+</div></section>
+<footer class="band strip foot"><div class="wrap">
+<p class="f1">Stratus Dynamics · EnergyBalance · © 2026 | MSc. Daniel Canedo</p>
+<p class="f2">4-Layer Architecture: Data → Research → Decision → Intelligence</p>
+</div></footer>
+
+<script>
+{
+const Y0=2026,N=15,YRS=Array.from({length:N},(_,i)=>Y0+i);
+const RES={"1P":2.30,"2P":2.76,"3P":3.24};
+const DEF={dec:10,res:"2P",newQ:0,newY:2029,eg:4,hyd:100,ren:100,eff:0,fg:2.5,fx:3500,pD:1.25,pG:1.10,pGi:9,pGe:8,expCap:10,impCap:10};
+const PRE={
+ "Inercial":{},
+ "Reactivación upstream":{dec:8,newQ:8,newY:2029,ren:150},
+ "Transición eléctrica":{ren:400,eff:15,eg:3.5},
+ "Crisis profunda":{dec:13,res:"1P",hyd:85,eg:5,fx:2500,fg:3.5}
+};
+const CTL=[
+ ["Gas y reservas"],
+ ["dec","Declinación de campos existentes",5,16,0.5,v=>v+" %/año","CBHE estima ~10 % anual"],
+ ["res","Categoría de reservas","sel"],
+ ["newQ","Nuevos hallazgos (meseta)",0,15,0.5,v=>v+" MMm³/d","Exploración exitosa; Mayaya y otros"],
+ ["newY","Año de primer gas nuevo",2027,2034,1,v=>v,""],
+ ["expCap","Tope de exportación",0,15,0.5,v=>v+" MMm³/d","Contrato con Brasil y Argentina"],
+ ["impCap","Capacidad de importar gas",0,20,1,v=>v+" MMm³/d","Gasoducto revertido desde Argentina"],
+ ["Electricidad"],
+ ["eg","Crecimiento demanda eléctrica",1,7,0.5,v=>v+" %/año",""],
+ ["hyd","Hidrología",70,115,5,v=>v+" % de lo normal","Año seco reduce la hidro"],
+ ["ren","Nueva solar/eólica/hidro",0,600,25,v=>v+" MW/año","Factor de planta 25 %"],
+ ["eff","Ahorro de gas en térmicas",0,30,1,v=>v+" %","Cierre de ciclos combinados al 2030"],
+ ["Combustibles y divisas"],
+ ["fg","Crecimiento demanda combustibles",-2,6,0.5,v=>v+" %/año","Menor tras quitar subsidios"],
+ ["fx","Divisas para importar energía",1500,8000,100,v=>"US$ "+v.toLocaleString("es-BO")+" M/año","Sin contar ingresos por exportar gas"],
+ ["pD","Precio diésel importado",0.7,1.6,0.05,v=>"US$ "+v.toFixed(2)+"/L","Puesto en Bolivia"],
+ ["pG","Precio gasolina importada",0.6,1.5,0.05,v=>"US$ "+v.toFixed(2)+"/L",""],
+ ["pGi","Precio gas importado",5,15,0.5,v=>"US$ "+v+"/MMBtu",""],
+ ["pGe","Precio gas exportado",4,12,0.5,v=>"US$ "+v+"/MMBtu",""]
+];
+let P={...DEF},fuel="D",active="Inercial";
+const $=id=>document.getElementById(id);
+const fmt=(v,d=1)=>v.toLocaleString("es-BO",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+function model(p,imp){
+ const MMBTU=13.27; // millones de MMBtu por año por cada MMm3/d
+ let rem=RES[p.res]*28.317; // bcm
+ const out=[];
+ for(let t=0;t<N;t++){
+  const y=Y0+t;
+  let ex=25*Math.pow(1-p.dec/100,t);
+  ex=Math.min(ex,rem*1000/365/5);rem=Math.max(0,rem-ex*0.365);
+  let nw=0;const k=y-p.newY;
+  if(p.newQ>0&&k>=0){nw=k<3?p.newQ*(k+1)/3:k<8?p.newQ:p.newQ*Math.pow(0.92,k-7)}
+  const sup=ex+nw;
+  const E=12.3*Math.pow(1+p.eg/100,t);
+  const hy=3.7*p.hyd/100;
+  const rn=1.2+Math.max(0,t)*p.ren*0.00219;
+  const thN=Math.max(0,E-hy-rn);
+  const effNow=p.eff/100*Math.min(1,t/4);
+  const gPow=thN*0.877*(1-effNow);
+  const gOth=8.4*Math.pow(1.02,t);
+  const dom=gOth+gPow;
+  const gap=Math.max(0,dom-sup);
+  const expo=Math.min(p.expCap,Math.max(0,sup-dom));
+  const expRev=expo*MMBTU*p.pGe;
+  const gImpW=imp?Math.min(p.impCap,gap):0;
+  const liq=sup/25;
+  const dD=7.0*Math.pow(1+p.fg/100,t),dG=4.6*Math.pow(1+p.fg/100,t);
+  const nD=Math.min(dD,0.7*liq),nG=Math.min(dG,2.0*liq);
+  const iDW=dD-nD,iGW=dG-nG;
+  const billW=(iDW*p.pD+iGW*p.pG)*365+gImpW*MMBTU*p.pGi;
+  const avail=p.fx+expRev;
+  const r=billW>0?Math.min(1,avail/billW):1;
+  const gImp=gImpW*r,iD=iDW*r,iG=iGW*r;
+  const short=Math.max(0,gap-gImp);
+  const shPow=dom>0?short*gPow/dom:0,shOth=short-shPow;
+  const thE=gPow>0?thN*(1-shPow/gPow):0;
+  const uns=thN-thE;
+  out.push({y,ex,nw,sup,gImp,short,dom,win:dom*1.12,expo,E,hy,rn,thE,uns,uP:uns/E*100,shOth,
+   dD,dG,nD,nG,iD,iG,fD:dD-nD-iD,fG:dG-nG-iG,bill:billW*r,billW,avail,r,expRev});
+ }
+ return out;
+}
+
+function kpis(R){
+ const cross=R.find(o=>o.dom>o.sup),win=R.find(o=>o.win>o.sup),noexp=R.find(o=>o.expo<0.5);
+ const mx=R.reduce((a,o)=>o.uP>a.uP?o:a,R[0]);
+ const r30=R[4],dcov=r30.dD>0?(r30.nD+r30.iD)/r30.dD*100:100;
+ const items=[
+  [cross?cross.y:"> 2040","La demanda interna supera la producción",!!cross],
+  [win?win.y:"> 2040","Primer invierno con déficit de gas",!!win],
+  [noexp?noexp.y:"> 2040","Fin práctico de las exportaciones",false],
+  [mx.uP>0.05?fmt(mx.uP)+" %":"0 %","Energía eléctrica no servida, peor año"+(mx.uP>0.05?" ("+mx.y+")":""),mx.uP>0.05],
+  ["US$ "+fmt(r30.billW,0)+" M","Factura de importación energética 2030",false],
+  [fmt(dcov,0)+" %","Diésel abastecido en 2030",dcov<99]
+ ];
+ $("kpis").innerHTML=items.map(([v,l,b])=>`<div class="kv${b?" bad":""}"><b>${v}</b><span>${l}</span></div>`).join("");
+ $("headline").textContent=cross?`Bolivia: el gas propio deja de alcanzar para el mercado interno en ${cross.y}`:"Bolivia: el gas propio alcanza para el mercado interno hasta 2040 en este escenario";
+}
+
+function axes(W,H,m,max,step,unit,narrow){
+ let s="";
+ for(let v=0;v<=max+1e-9;v+=step){const yy=m.t+(H-m.t-m.b)*(1-v/max);
+  s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text x="${m.l-6}" y="${yy+4}" text-anchor="end">${fmt(v,0)}</text>`}
+ YRS.forEach((y,i)=>{if(narrow?i%4:i%2)return;const xx=m.l+(W-m.l-m.r)*(i+.5)/N;s+=`<text x="${xx}" y="${H-m.b+18}" text-anchor="middle">${y}</text>`});
+ return s+`<text x="${m.l-6}" y="${m.t-8}" text-anchor="end">${unit}</text>`;
+}
+function nice(v){const c=[1,2,2.5,5,10];const p=Math.pow(10,Math.floor(Math.log10(v/5)));for(const k of c)if(v/(k*p)<=6)return k*p;return 10*p}
+
+function bars(svg,series,lines,unit){
+ const W=svg.clientWidth,H=svg.clientHeight;if(!W||!H)return;
+ const narrow=W<520,m={l:40,r:narrow?12:110,t:24,b:28};
+ let max=0;R.forEach((o,i)=>{const s=series.reduce((a,se)=>a+se.v(o),0);max=Math.max(max,s,...lines.map(l=>l.v(o)))});
+ const st=nice(max*1.05);max=Math.ceil(max*1.05/st)*st;
+ const pw=W-m.l-m.r,ph=H-m.t-m.b,bw=pw/N*.72,Y=v=>m.t+ph*(1-v/max),X=i=>m.l+pw*(i+.5)/N;
+ let s=axes(W,H,m,max,st,unit,narrow);
+ R.forEach((o,i)=>{let acc=0;series.forEach(se=>{const v=se.v(o);if(v<=0)return;s+=`<rect x="${X(i)-bw/2}" y="${Y(acc+v)}" width="${bw}" height="${Y(acc)-Y(acc+v)}" fill="${se.c}"><title>${o.y} · ${se.n}: ${fmt(v)}</title></rect>`;acc+=v})});
+ lines.forEach(l=>{const d=R.map((o,i)=>(i?"L":"M")+X(i)+","+Y(l.v(o))).join("");s+=`<path class="m" d="${d}" fill="none" stroke="${l.c}" stroke-width="2.5" ${l.dash?'stroke-dasharray="6 4"':""}/>`;
+  if(!narrow){const o=R[N-1];s+=`<text class="lab" x="${X(N-1)+bw/2+6}" y="${Y(l.v(o))+4}">${l.n}</text>`}});
+ if(!narrow){const o=R[N-1];let acc=0;series.forEach(se=>{const v=se.v(o);if(v>max*.06)s+=`<text x="${X(N-1)+bw/2+6}" y="${Y(acc+v/2)+4}">${se.n}</text>`;acc+=v})}
+ svg.innerHTML=s;
+}
+function key(id,arr){$(id).innerHTML=arr.map(([n,c,d])=>`<span><i style="background:${c};${d?"height:3px;vertical-align:3px":""}"></i>${n}</span>`).join("")}
+
+let R=[];
+const S1=[{n:"Campos existentes",c:"var(--co)",v:o=>o.ex},{n:"Nuevos hallazgos",c:"var(--co2)",v:o=>o.nw},{n:"Gas importado",c:"var(--amb)",v:o=>o.gImp},{n:"Faltante",c:"var(--red)",v:o=>o.short}];
+const L1=[{n:"Demanda interna",c:"var(--ink)",v:o=>o.dom},{n:"Invierno",c:"var(--ink)",v:o=>o.win,dash:1}];
+const S2=[{n:"Hidro",c:"var(--hyd)",v:o=>o.hy},{n:"Renovables",c:"var(--sol)",v:o=>o.rn},{n:"Térmica a gas",c:"var(--co)",v:o=>o.thE},{n:"No servida",c:"var(--red)",v:o=>o.uns}];
+const S3=()=>fuel==="D"?[{n:"Nacional",c:"var(--co)",v:o=>o.nD},{n:"Importado",c:"var(--amb)",v:o=>o.iD},{n:"Faltante",c:"var(--red)",v:o=>o.fD}]:[{n:"Nacional",c:"var(--co)",v:o=>o.nG},{n:"Importada",c:"var(--amb)",v:o=>o.iG},{n:"Faltante",c:"var(--red)",v:o=>o.fG}];
+key("k1",S1.map(s=>[s.n,s.c]).concat([["Demanda interna","var(--ink)",1],["Demanda en invierno (punteada)","var(--ink)",1]]));
+key("k2",S2.map(s=>[s.n==="Renovables"?"Solar, eólica, biomasa y nueva hidro":s.n,s.c]));
+const draw1=()=>bars($("g1"),S1,L1,"MMm³/d"),draw2=()=>bars($("g2"),S2,[],"TWh"),draw3=()=>{key("k3",S3().map(s=>[s.n,s.c]));bars($("g3"),S3(),[],"M L/d")};
+const ro1=new ResizeObserver(draw1),ro2=new ResizeObserver(draw2),ro3=new ResizeObserver(draw3);
+ro1.observe($("g1"));ro2.observe($("g2"));ro3.observe($("g3"));
+
+function table(){
+ const h=["Año","Producción gas","Demanda interna","Export.","Import. gas","Faltante gas","Electricidad no servida","Diésel importado","Diésel faltante","Factura import. (US$ M)","Divisas + export. gas (US$ M)"];
+ const sub=["","MMm³/d","MMm³/d","MMm³/d","MMm³/d","MMm³/d","%","M L/d","M L/d","",""];
+ $("tbl").innerHTML=`<thead><tr>${h.map((x,i)=>`<th>${x}${sub[i]?"<br>"+sub[i]:""}</th>`).join("")}</tr></thead><tbody>`+
+ R.map(o=>`<tr><td>${o.y}</td><td>${fmt(o.sup)}</td><td>${fmt(o.dom)}</td><td>${fmt(o.expo)}</td><td>${fmt(o.gImp)}</td><td class="${o.short>0.05?"neg":""}">${fmt(o.short)}</td><td class="${o.uP>0.05?"neg":""}">${fmt(o.uP)}</td><td>${fmt(o.iD,2)}</td><td class="${o.fD>0.01?"neg":""}">${fmt(o.fD,2)}</td><td>${fmt(o.bill,0)}</td><td>${fmt(o.avail,0)}</td></tr>`).join("")+"</tbody>";
+}
+function run(){R=model(P,$("imp").checked);kpis(R);draw1();draw2();draw3();table();
+ document.querySelectorAll("#presets button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===active))}
+
+$("presets").innerHTML=Object.keys(PRE).map(k=>`<button type="button" data-k="${k}">${k}</button>`).join("");
+$("ctls").innerHTML=CTL.map(c=>{
+ if(c.length===1)return `<fieldset><legend>${c[0]}</legend></fieldset>`;
+ const [k,l,a,b,st,f,h]=c;
+ if(a==="sel")return `<div class="ctl"><label for="c_${k}">${l}</label><select id="c_${k}"><option value="1P">Probadas (1P) · 2,30 TCF</option><option value="2P">Probadas + probables (2P) · 2,76 TCF</option><option value="3P">1P + 2P + posibles (3P) · 3,24 TCF</option></select></div>`;
+ return `<div class="ctl"><label for="c_${k}">${l}<output id="o_${k}"></output></label><input type="range" id="c_${k}" min="${a}" max="${b}" step="${st}">${h?`<small>${h}</small>`:""}</div>`}).join("");
+function sync(){CTL.forEach(c=>{if(c.length===1)return;const [k,,a,,,f]=c;const el=$("c_"+k);el.value=P[k];if(a!=="sel")$("o_"+k).textContent=f(+P[k])})}
+CTL.forEach(c=>{if(c.length===1)return;const [k,,a,,,f]=c;$("c_"+k).addEventListener("input",e=>{P[k]=a==="sel"?e.target.value:+e.target.value;if(a!=="sel")$("o_"+k).textContent=f(P[k]);active="";run()})});
+$("presets").addEventListener("click",e=>{const k=e.target.dataset?.k;if(!k)return;active=k;P={...DEF,...PRE[k]};$("imp").checked=true;sync();run()});
+$("reset").addEventListener("click",()=>{active="Inercial";P={...DEF};$("imp").checked=true;sync();run()});
+$("imp").addEventListener("change",()=>{active="";run()});
+$("bD").addEventListener("click",()=>{fuel="D";$("bD").setAttribute("aria-pressed","true");$("bG").setAttribute("aria-pressed","false");draw3()});
+$("bG").addEventListener("click",()=>{fuel="G";$("bG").setAttribute("aria-pressed","true");$("bD").setAttribute("aria-pressed","false");draw3()});
+sync();run();
+window.__model=model;window.__P=()=>P;
+}
+</script>
+</body>
+</html>
