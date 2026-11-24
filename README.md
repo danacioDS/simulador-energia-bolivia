@@ -15,6 +15,15 @@ El modelo tiene cuatro partes:
 
 Incluye cuatro escenarios predefinidos: Inercial, Reactivación upstream, Transición eléctrica y Crisis profunda.
 
+## Pestañas
+
+- **Global:** estado de los 4 sectores, Intelligence Brief y señales líderes.
+- **Gas:** balance de gas e índice de cobertura con sus umbrales.
+- **Electricidad:** generación por fuente y energía no servida.
+- **Combustibles:** diésel, gasolina, divisas y factura energética.
+- **Decisión:** ranking de escenarios por puntaje de seguridad energética.
+- **About:** historia del proyecto, fundamento académico y autor.
+
 ## Datos de partida (2025–2026)
 
 - Producción de gas: ~25 MMm³/d a inicios de 2026 (Fundación Jubileo, Correo del Sur).
