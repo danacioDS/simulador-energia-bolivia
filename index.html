@@ -3,66 +3,103 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Simulador de escenarios 2026–2040: cómo la caída del gas natural afecta la electricidad, los combustibles y las divisas de Bolivia.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="EnergyBalance · ¿Cuándo deja de alcanzar el gas en Bolivia?">
+<meta property="og:description" content="Simulador de escenarios 2026–2040: gas, electricidad, combustibles y divisas. Stratus Dynamics · MSc. Daniel Canedo.">
+<meta property="og:url" content="https://danaciods.github.io/simulador-energia-bolivia/">
+<meta property="og:image" content="https://danaciods.github.io/simulador-energia-bolivia/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+<meta name="twitter:card" content="summary_large_image">
 <title>EnergyBalance Bolivia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* VOICE work: energy decision-intelligence product, calm and exact
-   IDEA a control-room console: dark command bar, instrument sidebar, readout cards
-   PICTURE the national gas balance chart, deficit in red, beside a sticky instrument panel
-   COLOUR ink-dark bar, white/deep ground, gas-flame cobalt, Bolivian red for deficit, teal for imports
+/* VOICE work: calm analytical tool, easy on the eyes
+   IDEA a printed energy-policy bulletin: quiet paper, one muted ink per source
+   PICTURE the national gas balance chart; hover reads a whole year
+   COLOUR soft grey ground, white cards, muted blue gas, soft orange imports, moderate red deficit only
    TYPE Space Grotesk 600 + Inter
-   LAYOUT bar + tabs on top; sidebar of controls left, readouts right; phone: title, chart, controls */
-:root{color-scheme:light dark;--bg:light-dark(#f4f6fb,#080b14);--card:light-dark(#ffffff,#10152a);--ink:light-dark(#0b1020,#e8ecff);--mute:light-dark(#4a5170,#9aa3c7);--zone:light-dark(#eef2ff,#161c36);--line:light-dark(#dde3f3,#252d52);--co:#1240e0;--co2:light-dark(#6f8cff,#6f8cff);--red:#d52b1e;--amb:light-dark(#0c9c8f,#2cc4b5);--hyd:light-dark(#0f6f8d,#4fb3d9);--sol:#e8b400;--bar:#0b1020}
+   LAYOUT light top bar with tabs; controls left, readouts right; phone: title, chart, controls */
+:root{color-scheme:light dark;--bg:light-dark(#f5f6f8,#16181d);--card:light-dark(#ffffff,#1e2128);--ink:light-dark(#1f2933,#e6e8eb);--mute:light-dark(#5f6b7a,#a3abb7);--zone:light-dark(#f0f2f5,#262a32);--line:light-dark(#e3e6eb,#333844);--acc:light-dark(#3f6c9e,#8fb3dc);--gas:light-dark(#4e79a7,#6b94c2);--gas2:light-dark(#a9c6e2,#8aa9c8);--imp:light-dark(#e8964a,#eaa15d);--red:light-dark(#d65f58,#e3726b);--hyd:light-dark(#9cc3d9,#7fb0cc);--sol:light-dark(#e3c35a,#d9bb57);--ok:light-dark(#4f8f4a,#7dbb76);--warn:light-dark(#9a7414,#d9b453)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 html{scroll-padding-top:72px}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
-h1,h2,h3,.kv b,.brand b,.stat b{font-family:"Space Grotesk",Inter,sans-serif;letter-spacing:-.02em}
-a{color:var(--co2)}
-.bar{position:sticky;top:0;z-index:5;background:var(--bar);color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;padding:10px max(3vw,16px)}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff}
+h1,h2,h3,.kv b,.stat b,.brand b{font-family:"Space Grotesk",Inter,sans-serif;letter-spacing:-.01em}
+a{color:var(--acc)}
+.bar{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;padding:8px max(3vw,16px)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
 .brand svg{width:30px;height:30px;flex:none}
-.brand b{color:#fff;font-size:19px;display:block;line-height:1.1}
-.brand span{font-size:13px;color:#a9b4e0;display:block}
-.tabs{display:flex;gap:4px;margin-left:auto}
-.tabs a{color:#cfd7ff;text-decoration:none;font:600 15px Inter,sans-serif;padding:10px 14px;border-radius:8px;min-height:44px;display:flex;align-items:center}
-.tabs a[aria-current=page]{background:#1240e0;color:#fff}
-.tabs a:hover{background:#1c2547}
+.bt b{font-size:19px;display:block;line-height:1.1}
+.bt em{font-style:normal;font-size:12px;font-weight:600;background:var(--zone);color:var(--mute);border:1px solid var(--line);border-radius:6px;padding:0 6px;vertical-align:3px;margin-left:4px}
+.bt small{display:block;font-size:13px;color:var(--mute)}
+.live{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute)}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.live b{color:var(--ink);font:600 15px "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.tabs a{flex:none;color:var(--mute);text-decoration:none;font:600 15px Inter,sans-serif;padding:10px 12px;min-height:44px;display:flex;align-items:center;border-bottom:3px solid transparent}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current=page]{color:var(--ink);border-bottom-color:var(--acc)}
 .wrap{max-width:1320px;margin:0 auto;padding:clamp(18px,2.5vw,32px) max(3vw,16px)}
-.app{display:grid;grid-template-columns:310px minmax(0,1fr);gap:24px;align-items:start}
-.side{position:sticky;top:76px;max-height:calc(100vh - 92px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:clamp(16px,2vw,24px);margin-bottom:20px}
-.hero h1{margin:0;font-size:clamp(28px,3.4vw,42px);line-height:1.05;text-wrap:balance;max-width:26ch}
-.hero p{margin:8px 0 0;color:var(--mute);max-width:72ch}
-.fig{position:relative;min-height:340px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
-.big .fig{min-height:440px}
-svg text{font:13px Inter,sans-serif;fill:var(--mute);paint-order:stroke;stroke:var(--card);stroke-width:4px}
-svg .lab{fill:var(--ink);font-weight:600}
-h2{font-size:22px;line-height:1.15;margin:0 0 4px}
+.app{display:grid;grid-template-columns:300px minmax(0,1fr);gap:24px;align-items:start}
+.side{position:sticky;top:76px;max-height:calc(100vh - 92px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:clamp(16px,2vw,22px);margin-bottom:18px}
+.hero h1{margin:0 0 14px;font-size:clamp(26px,3vw,38px);line-height:1.1;text-wrap:balance;max-width:28ch}
+h2{font-size:20px;line-height:1.2;margin:0 0 4px}
+h3{font:600 15px "Space Grotesk",sans-serif;margin:12px 0 4px}
 .sub{color:var(--mute);margin:0 0 10px;font-size:15px}
-.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
-.kv{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.kv b{display:block;font-size:clamp(22px,2.4vw,30px);line-height:1.1;white-space:nowrap}
+.ctx{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px;white-space:nowrap}
+.chip b{font-weight:600;font-variant-numeric:tabular-nums}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--mute)}
+.chip.on i{background:var(--ok)}.chip.off i{background:var(--red)}
+.fig{position:relative;min-height:330px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.big .fig{min-height:420px}.fig.small{min-height:230px}.fig.strip{min-height:170px}
+svg text{font:13px Inter,sans-serif;fill:var(--mute);paint-order:stroke;stroke:var(--card);stroke-width:4px;font-variant-numeric:tabular-nums}
+svg .lab{fill:var(--ink);font-weight:600}
+.tip{position:absolute;pointer-events:none;z-index:3;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.12);padding:10px 12px;font-size:13px;min-width:200px;display:none}
+.tip b.t{display:block;font:600 15px "Space Grotesk",sans-serif;margin-bottom:4px}
+.tip div{display:flex;justify-content:space-between;gap:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tip div span{display:flex;align-items:center;gap:6px;color:var(--mute)}
+.tip i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.tip hr{border:0;border-top:1px solid var(--line);margin:5px 0}
+.tip p{margin:4px 0 0;color:var(--mute);white-space:normal;max-width:240px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.kpis.k5{grid-template-columns:repeat(5,minmax(0,1fr));margin-bottom:18px}
+.kv{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+.kv b{display:block;font-size:clamp(20px,2.2vw,26px);line-height:1.15;white-space:nowrap;font-variant-numeric:tabular-nums}
 .kv span{font-size:13px;color:var(--mute)}
-.kv.bad{border-color:color-mix(in srgb,var(--red) 45%,var(--line))}
 .kv.bad b{color:var(--red)}
-.presets{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.kv .b{margin-top:4px}
+.uni{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:8px}
+.uni a{display:block;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px}
+.uni a:hover{border-color:var(--acc)}
+.uni b{display:block;font:600 16px "Space Grotesk",sans-serif;margin-bottom:6px}
+.uni span.v{display:block;font-size:13px;color:var(--mute);margin-top:6px;font-variant-numeric:tabular-nums}
+.b{display:inline-block;font:600 12px Inter,sans-serif;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.b.ok{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
+.b.warn{background:color-mix(in srgb,#e3c35a 25%,transparent);color:var(--warn)}
+.b.bad{background:color-mix(in srgb,var(--red) 14%,transparent);color:var(--red)}
+.b.crit{background:color-mix(in srgb,var(--red) 85%,transparent);color:#fff}
+.presets{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
 button{font:600 14px Inter,sans-serif;min-height:44px;padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer;line-height:1.2}
-button:hover{border-color:var(--co)}
-button[aria-pressed=true]{background:var(--co);border-color:var(--co);color:#fff}
-button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--co2);outline-offset:2px}
+button:hover{border-color:var(--acc)}
+button[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--card)}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 .ctl{margin:10px 0}
 .ctl label{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:500}
-.ctl output{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--co2);font-weight:600}
-input[type=range]{width:100%;accent-color:#1240e0;height:28px}
+.ctl output{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--acc);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--acc);height:28px}
 select{font:16px Inter,sans-serif;width:100%;min-height:44px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px}
 .ctl small{display:block;color:var(--mute);font-size:13px;line-height:1.35}
 fieldset{border:0;border-top:1px solid var(--line);padding:10px 0 0;margin:14px 0 0}
 legend{font:600 15px "Space Grotesk",sans-serif;padding-right:6px}
-.chk{display:flex;gap:8px;align-items:center;font-size:14px;margin-top:8px}.chk input{width:20px;height:20px;flex:none}
-.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
-.two .card{margin:0}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;margin-top:8px}.chk input{width:20px;height:20px;flex:none;accent-color:var(--acc)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.two>.card{margin:0}
+.two+.card,.two+.two{margin-top:18px}
 .key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--mute);margin:6px 0}
 .key i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 .seg{display:flex;gap:6px;margin:4px 0 6px}
@@ -72,100 +109,72 @@ th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white
 th:first-child,td:first-child{text-align:left}
 th{font-weight:600;font-size:13px;color:var(--mute);vertical-align:bottom;white-space:normal}
 td.neg{color:var(--red);font-weight:600}
-.notes ul{padding-left:18px;margin:6px 0}.notes li{margin:5px 0}
+tr.cur td{background:var(--zone)}
+table.thr td{text-align:left;white-space:normal}
+table.thr td:first-child{width:1%;white-space:nowrap}
+table.thr tr.on td{background:var(--zone);font-weight:600}
+table.thr td.here{text-align:right;color:var(--acc);font-weight:600;white-space:nowrap}
+details{border-top:1px solid var(--line);margin-top:12px;padding-top:4px}
+summary{cursor:pointer;font:600 15px "Space Grotesk",sans-serif;min-height:40px;display:flex;align-items:center;color:var(--acc)}
+.formula{background:var(--zone);border-radius:8px;padding:10px 12px;margin:8px 0;font:500 15px "Space Grotesk",sans-serif;overflow-wrap:anywhere}
+.note{background:var(--zone);border-radius:8px;padding:10px 12px;font-size:14px}
+.sig{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.sig .n{font:600 14px "Space Grotesk",sans-serif;color:var(--mute)}
+.sig b{font-weight:600}
+.sig small{display:block;color:var(--mute);font-size:13px}
+.sig .y{font:600 19px "Space Grotesk",sans-serif;text-align:right;font-variant-numeric:tabular-nums}
+#brief2 p{margin:5px 0}
+.score{font:600 17px "Space Grotesk",sans-serif}
+.rk td:nth-child(2){text-align:left}
 /* About */
-.ab-hero{background:var(--bar);color:#fff}
+.ab-hero{background:var(--card);border-bottom:1px solid var(--line)}
 .ab-hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:32px;align-items:center}
-.ab-hero h1{font-size:clamp(34px,5vw,56px);line-height:1.02;margin:0}
-.ab-hero p{color:#c3cbef;margin:8px 0 0;max-width:52ch}
-.ver{font-size:14px;color:#8f9bd0}
-.chain{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;position:relative}
-.node{background:#141b38;border:1px solid #2a3466;border-radius:12px;padding:14px 12px;position:relative}
-.node b{display:block;font:600 17px "Space Grotesk",sans-serif;color:#fff}
-.node span{font-size:13px;color:#a9b4e0;line-height:1.35;display:block;margin-top:2px}
-.node i{display:block;height:6px;border-radius:3px;margin-bottom:10px}
-.node:not(:last-child)::after{content:"→";position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:#6f8cff;font-weight:700;z-index:1}
+.ab-hero h1{font-size:clamp(34px,5vw,52px);line-height:1.05;margin:0}
+.ab-hero p{color:var(--mute);margin:6px 0 0;max-width:52ch}
+.ver{font-size:14px}
+.chain{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.node{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;position:relative}
+.node b{display:block;font:600 16px "Space Grotesk",sans-serif}
+.node span{font-size:13px;color:var(--mute);line-height:1.35;display:block;margin-top:2px}
+.node i{display:block;height:5px;border-radius:3px;margin-bottom:10px}
+.node:not(:last-child)::after{content:"→";position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--mute);font-weight:700}
 .story{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px}
 .story p{margin:0 0 12px;max-width:68ch}
-blockquote{margin:0;background:#1240e0;color:#fff;border-radius:14px;padding:24px;font:600 clamp(20px,2.2vw,26px)/1.3 "Space Grotesk",sans-serif;display:flex;align-items:center}
-.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}
-.metrics div{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+blockquote{margin:0;background:var(--zone);border-left:4px solid var(--acc);border-radius:8px;padding:22px;font:600 clamp(19px,2vw,23px)/1.35 "Space Grotesk",sans-serif;display:flex;align-items:center}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.metrics div{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
 .metrics b{display:block;font-weight:600}
 .metrics span{font-size:14px;color:var(--mute)}
-.formula{background:var(--zone);border-radius:10px;padding:12px 14px;font:500 16px "Space Grotesk",sans-serif;overflow-wrap:anywhere}
-.refs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.refs div{border:1px solid var(--line);border-radius:12px;padding:14px}
+.refs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.refs div{border:1px solid var(--line);border-radius:10px;padding:14px}
 .refs b{display:block;font-family:"Space Grotesk",sans-serif}
 .refs em{display:block;font-size:14px;color:var(--mute);margin-bottom:4px}
 .refs p{margin:0;font-size:15px}
 .author{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:start}
-.mono{width:84px;height:84px;border-radius:50%;background:#1240e0;color:#fff;display:grid;place-items:center;font:700 30px "Space Grotesk",sans-serif}
-.author h3{margin:0;font-size:24px}
+.mono{width:80px;height:80px;border-radius:50%;background:var(--zone);border:2px solid var(--acc);color:var(--acc);display:grid;place-items:center;font:700 28px "Space Grotesk",sans-serif}
+.author h3{margin:0;font-size:22px}
 .role{color:var(--mute);margin:2px 0 10px}
 .creds{list-style:none;padding:0;margin:0 0 12px;display:grid;gap:6px}
 .creds li{padding-left:16px;position:relative}
-.creds li::before{content:"";position:absolute;left:0;top:.6em;width:7px;height:7px;border-radius:2px;background:var(--co)}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
-.stat{background:var(--zone);border-radius:12px;padding:14px}
-.stat b{display:block;font-size:clamp(24px,3vw,34px);line-height:1.1;color:var(--co2)}
+.creds li::before{content:"";position:absolute;left:0;top:.6em;width:7px;height:7px;border-radius:2px;background:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.stat{background:var(--zone);border-radius:10px;padding:14px}
+.stat b{display:block;font-size:clamp(24px,3vw,32px);line-height:1.1;color:var(--acc);font-variant-numeric:tabular-nums}
 .stat span{font-size:14px;color:var(--mute)}
-.foot{background:var(--bar);color:#fff;padding:20px max(3vw,16px)}
-.foot p{margin:0;max-width:1320px;margin-inline:auto}
+.foot{background:var(--card);border-top:1px solid var(--line);padding:18px max(3vw,16px)}
+.foot p{margin:0 auto;max-width:1320px}
 .foot .f1{font:600 15px "Space Grotesk",Inter,sans-serif}
-.foot .f2{font-size:14px;color:#a9b4e0;margin-top:4px}
+.foot .f2{font-size:14px;color:var(--mute);margin-top:4px}
 [hidden]{display:none!important}
-@media(max-width:1000px){.app{grid-template-columns:minmax(0,1fr)}.side{position:static;max-height:none;order:2}.main{order:1}.two,.story,.refs,.ab-hero .wrap{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:600px){.fig,.big .fig{min-height:300px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}table{font-size:13px}th,td{padding:6px 4px}.chain,.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.node:nth-child(2)::after{content:none}.stats{grid-template-columns:minmax(0,1fr)}.author{grid-template-columns:minmax(0,1fr)}.tabs{margin-left:0;width:100%}.tabs a{flex:1;justify-content:center}}
-@media(prefers-reduced-motion:no-preference){.view{animation:in .3s ease}@keyframes in{from{opacity:0;transform:translateY(6px)}}}
-.bt b{color:#fff;font-size:19px;display:block;line-height:1.1}
-.bt em{font-style:normal;font-size:12px;font-weight:600;background:#1240e0;color:#fff;border-radius:6px;padding:1px 6px;vertical-align:3px;margin-left:4px}
-.bt small{display:block;font-size:13px;color:#a9b4e0}
-.live{display:flex;align-items:center;gap:8px;font-size:13px;color:#a9b4e0;flex-wrap:wrap}
-.live i{width:8px;height:8px;border-radius:50%;background:#2cc4b5;box-shadow:0 0 0 3px rgba(44,196,181,.25)}
-.live b{color:#fff;font:600 15px "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums}
-.tabs{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
-.tabs a{flex:none}
-h3{font:600 16px "Space Grotesk",sans-serif;margin:14px 0 4px}
-h3:first-of-type{margin-top:6px}
-.uni{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:8px}
-.uni a{display:block;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card)}
-.uni a:hover{border-color:var(--co)}
-.uni b{display:block;font:600 17px "Space Grotesk",sans-serif;margin-bottom:6px}
-.uni span.v{display:block;font-size:13px;color:var(--mute);margin-top:6px}
-.b{display:inline-block;font:700 12px Inter,sans-serif;letter-spacing:.02em;padding:3px 8px;border-radius:6px;white-space:nowrap}
-.b.ok{background:color-mix(in srgb,#0c9c8f 16%,transparent);color:light-dark(#08756b,#46d6c7)}
-.b.warn{background:color-mix(in srgb,#e8b400 20%,transparent);color:light-dark(#8a6a00,#f2cc4a)}
-.b.bad{background:color-mix(in srgb,#d52b1e 16%,transparent);color:light-dark(#b3221a,#ff6d62)}
-.b.crit{background:#d52b1e;color:#fff}
-.status{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;background:var(--zone);border-radius:10px;padding:10px 14px;margin:8px 0 10px;font-size:14px}
-.status .s b{display:block;font:600 18px "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums}
-.status .s span{color:var(--mute);font-size:13px}
-.status p{margin:0;flex-basis:100%;color:var(--ink)}
-.gauge{margin:10px 0 14px}
-.gauge .track{position:relative;height:14px;border-radius:7px;background:linear-gradient(90deg,#d52b1e,#e8b400 50%,#0c9c8f)}
-.gauge .pin{position:absolute;top:-5px;width:4px;height:24px;background:var(--ink);border-radius:2px;transform:translateX(-2px)}
-.gauge .gl{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);margin-top:6px}
-.gauge .gv{font:700 clamp(28px,3.4vw,40px)/1.1 "Space Grotesk",sans-serif;margin-bottom:8px}
-table.thr td{text-align:left;white-space:normal;font-variant-numeric:normal}
-table.thr td:first-child{width:1%;white-space:nowrap}
-.sig{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
-.sig .n{font:700 15px "Space Grotesk",sans-serif;color:var(--mute)}
-.sig b{font-weight:600}
-.sig small{display:block;color:var(--mute);font-size:13px}
-.sig .y{font:700 20px "Space Grotesk",sans-serif;text-align:right}
-.note{background:var(--zone);border-radius:8px;padding:10px 12px;font-size:14px}
-.fig.small{min-height:260px}
-#brief2 p{margin:4px 0}
-.rk td:nth-child(2){text-align:left}
-.score{font:700 18px "Space Grotesk",sans-serif}
-.cur td{background:var(--zone)}
-@media(max-width:1000px){.uni{grid-template-columns:repeat(2,minmax(0,1fr))}.live small{display:none}}
-@media(max-width:600px){.tabs{width:100%;margin-left:0}.tabs a{flex:none}.live{display:none}}
+@media(max-width:1100px){.kpis.k5{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1000px){.app{grid-template-columns:minmax(0,1fr)}.side{position:static;max-height:none;order:2}.main{order:1}.two,.story,.refs,.ab-hero .wrap{grid-template-columns:minmax(0,1fr)}.uni{grid-template-columns:repeat(3,minmax(0,1fr))}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.live small{display:none}}
+@media(max-width:600px){.fig,.big .fig{min-height:300px}.kpis,.kpis.k5,.uni,.chain,.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}table{font-size:13px}th,td{padding:6px 4px}.node:nth-child(2)::after{content:none}.stats,.author{grid-template-columns:minmax(0,1fr)}.tabs{width:100%;margin-left:0}.live{display:none}}
+@media(prefers-reduced-motion:no-preference){.view{animation:in .25s ease}@keyframes in{from{opacity:0}}}
 </style>
 </head>
 <body>
 <nav class="bar" aria-label="Principal">
- <a class="brand" href="#global"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1240e0"/><path d="M16 5c1 5 7 8 7 14a7 7 0 0 1-14 0c0-3 1.5-5 3.5-6.5C12 16 14 17 15 17c-1-4 0-8 1-12z" fill="#fff"/><path d="M16 17c2 2 3 3.5 3 5a3 3 0 0 1-6 0c0-1.6 1.2-3 3-5z" fill="#6f8cff"/></svg><span class="bt"><b>EnergyBalance <em>v1.0</em></b><small>Energy Intelligence</small></span></a>
+ <a class="brand" href="#global"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#4e79a7"/><path d="M16 5c1 5 7 8 7 14a7 7 0 0 1-14 0c0-3 1.5-5 3.5-6.5C12 16 14 17 15 17c-1-4 0-8 1-12z" fill="#fff"/><path d="M16 17c2 2 3 3.5 3 5a3 3 0 0 1-6 0c0-1.6 1.2-3 3-5z" fill="#a9c6e2"/></svg><span class="bt"><b>EnergyBalance <em>v1.0</em></b><small>Energy Intelligence</small></span></a>
  <div class="live"><i></i><span>Escenario en vivo</span><b id="clock">--:--:--</b><small>Datos: nov 2026</small></div>
  <div class="tabs" id="tabs"><a href="#global">Global</a><a href="#gas">Gas</a><a href="#electricidad">Electricidad</a><a href="#combustibles">Combustibles</a><a href="#decision">Decisión</a><a href="#about">About</a></div>
 </nav>
@@ -174,18 +183,19 @@ table.thr td:first-child{width:1%;white-space:nowrap}
 <aside class="side" aria-label="Supuestos del escenario">
 <h2>⚙️ Escenario</h2>
 <div class="presets" id="presets"></div>
-<div class="ctl yr"><label for="c_year">Año de análisis<output id="o_year"></output></label><input type="range" id="c_year" min="2026" max="2040" step="1" value="2030"><small>Define los estados y el informe</small></div>
-<div id="ctls"></div>
+<div class="ctl"><label for="c_year">Año de análisis<output id="o_year"></output></label><input type="range" id="c_year" min="2026" max="2040" step="1" value="2030"><small>Define los estados y el informe</small></div>
 <label class="chk"><input type="checkbox" id="imp" checked> Permitir importar gas (p. ej. desde Argentina)</label>
+<div id="ctls"></div>
 <div class="ctl"><button id="reset" type="button">Restablecer escenario</button></div>
 </aside>
 
 <div class="main">
+<div class="ctx" id="ctx" aria-label="Escenario activo"></div>
 
 <section id="p-global" class="view">
 <div class="card">
 <h2>🌍 Energy Intelligence · Bolivia</h2>
-<p class="sub">4 sectores · horizonte 2026–2040 · estado en <b class="yy"></b></p>
+<p class="sub">5 sectores · horizonte 2026–2040 · estado en <b class="yy"></b></p>
 <div class="uni" id="uni"></div>
 </div>
 <div class="card hero">
@@ -194,7 +204,7 @@ table.thr td:first-child{width:1%;white-space:nowrap}
 </div>
 <div class="card big">
 <h2>📊 Balance nacional de gas natural</h2>
-<p class="sub">MMm³/d. Oferta por fuente frente a la demanda interna; en rojo, gas que no llega. La línea vertical marca el año de análisis.</p>
+<p class="sub">MMm³/d. Pase el cursor sobre un año para ver el detalle. La franja gris marca el año de análisis.</p>
 <div class="key" id="k1"></div>
 <div class="fig"><svg id="g1" role="img" aria-label="Balance de gas por año"></svg></div>
 </div>
@@ -206,73 +216,71 @@ table.thr td:first-child{width:1%;white-space:nowrap}
 </div>
 <div class="card">
 <h2>📡 Señales líderes</h2>
-<p class="sub">Primer año en que cada sector entra en estrés. Ordenado del más urgente al menos urgente.</p>
+<p class="sub">Primer año en que cada sector entra en estrés, del más urgente al menos urgente.</p>
 <div id="signals"></div>
 </div>
 </div>
 </section>
 
 <section id="p-gas" class="view" hidden>
-<div class="card">
-<h2>🔥 Gas natural · <span class="yy"></span></h2>
-<div class="status" id="st-gas"></div>
+<div class="kpis k5" id="kp-gas"></div>
+<div class="card big">
+<h2>🔥 Balance de gas natural · <span class="yy"></span></h2>
+<p class="sub">MMm³/d. Producción propia, nuevos hallazgos e importación frente a la demanda interna.</p>
+<div class="key" id="k1b"></div>
 <div class="fig"><svg id="g1b" role="img" aria-label="Balance de gas"></svg></div>
 </div>
-<div class="two">
 <div class="card">
 <h2>📉 Índice de cobertura de gas</h2>
-<p class="sub">Producción propia dividida entre la demanda interna.</p>
-<div class="gauge" id="gauge-gas"></div>
-<table class="thr"><tbody>
-<tr><td><span class="b ok">≥ 1,20</span></td><td>Holgado</td><td>Hay excedente para exportar</td></tr>
-<tr><td><span class="b warn">1,00 – 1,20</span></td><td>Ajustado</td><td>Exportación en retirada</td></tr>
-<tr><td><span class="b bad">0,80 – 1,00</span></td><td>Déficit</td><td>Se necesita importar gas</td></tr>
-<tr><td><span class="b crit">&lt; 0,80</span></td><td>Crítico</td><td>Racionamiento si no hay importación</td></tr>
+<p class="sub">Producción propia dividida entre la demanda interna. La fila resaltada es el año de análisis.</p>
+<table class="thr" id="thr-gas"><tbody>
+<tr data-l="ok"><td><span class="b ok">≥ 1,20</span></td><td>Holgado</td><td>Hay excedente para exportar</td><td class="here"></td></tr>
+<tr data-l="warn"><td><span class="b warn">1,00 – 1,20</span></td><td>Ajustado</td><td>Exportación en retirada</td><td class="here"></td></tr>
+<tr data-l="bad"><td><span class="b bad">0,80 – 1,00</span></td><td>Déficit</td><td>Se necesita importar gas</td><td class="here"></td></tr>
+<tr data-l="crit"><td><span class="b crit">&lt; 0,80</span></td><td>Crítico</td><td>Racionamiento si no hay importación</td><td class="here"></td></tr>
 </tbody></table>
-</div>
-<div class="card">
-<h2>📖 ¿Qué significa?</h2>
+<details><summary>Ver modelo y fórmulas</summary>
 <div class="formula">Cobertura = Producción propia ÷ Demanda interna</div>
-<p>La producción sigue una curva de declinación exponencial (Arps, 1945) limitada por las reservas: ningún año puede extraerse más de 1/5 de lo que queda (R/P ≥ 5).</p>
 <div class="formula">q(t) = min[ q₀ · (1 − d)ᵗ , Reservas(t) ÷ 5 ]</div>
-<p class="note">ℹ️ El invierno eleva la demanda interna ~12 %: el déficit estacional aparece uno o dos años antes que el anual.</p>
-</div>
+<p>La producción sigue una curva de declinación exponencial (Arps, 1945) limitada por las reservas: ningún año puede extraerse más de 1/5 de lo que queda. Los nuevos hallazgos entran en rampa de 3 años, meseta de 5 y declinan 8 % anual.</p>
+<p class="note">El invierno eleva la demanda interna ~12 %: el déficit estacional aparece uno o dos años antes que el anual.</p>
+</details>
 </div>
 </section>
 
 <section id="p-power" class="view" hidden>
-<div class="card">
+<div class="kpis k5" id="kp-power"></div>
+<div class="card big">
 <h2>⚡ Generación eléctrica · <span class="yy"></span></h2>
-<div class="status" id="st-power"></div>
+<p class="sub">TWh por año. La térmica a gas cubre lo que no dan la hidro y las renovables; lo que falta es energía no servida.</p>
 <div class="key" id="k2"></div>
 <div class="fig"><svg id="g2" role="img" aria-label="Generación eléctrica por fuente"></svg></div>
+<h3>Energía no servida (% de la demanda)</h3>
+<div class="fig strip"><svg id="g5" role="img" aria-label="Porcentaje de energía no servida con umbrales"></svg></div>
 </div>
-<div class="two">
 <div class="card">
-<h2>📉 Energía no servida</h2>
-<p class="sub">Porcentaje de la demanda eléctrica que no se puede generar.</p>
-<div class="gauge" id="gauge-power"></div>
-<table class="thr"><tbody>
-<tr><td><span class="b ok">0 %</span></td><td>Normal</td><td>Demanda cubierta</td></tr>
-<tr><td><span class="b warn">0 – 2 %</span></td><td>Cortes puntuales</td><td>Picos de invierno</td></tr>
-<tr><td><span class="b bad">2 – 10 %</span></td><td>Racionamiento</td><td>Cortes programados</td></tr>
-<tr><td><span class="b crit">≥ 10 %</span></td><td>Crisis</td><td>Racionamiento diario prolongado</td></tr>
+<h2>📉 Niveles de energía no servida</h2>
+<p class="sub">La fila resaltada es el año de análisis.</p>
+<table class="thr" id="thr-power"><tbody>
+<tr data-l="ok"><td><span class="b ok">0 %</span></td><td>Normal</td><td>Demanda cubierta</td><td class="here"></td></tr>
+<tr data-l="warn"><td><span class="b warn">0 – 2 %</span></td><td>Cortes puntuales</td><td>Picos de invierno</td><td class="here"></td></tr>
+<tr data-l="bad"><td><span class="b bad">2 – 10 %</span></td><td>Racionamiento</td><td>Cortes programados</td><td class="here"></td></tr>
+<tr data-l="crit"><td><span class="b crit">≥ 10 %</span></td><td>Crisis</td><td>Racionamiento diario prolongado</td><td class="here"></td></tr>
 </tbody></table>
-</div>
-<div class="card">
-<h2>📖 ¿Qué significa?</h2>
-<div class="formula">Térmica = Demanda − Hidro × hidrología − Renovables</div>
+<details><summary>Ver modelo y fórmulas</summary>
+<div class="formula">Térmica requerida = Demanda − Hidro × hidrología − Renovables</div>
 <div class="formula">No servida = Térmica requerida − Gas disponible ÷ intensidad</div>
 <p>La intensidad de gas de las térmicas es ~0,32 mil millones de m³ por TWh. Cerrar ciclos combinados la reduce; cada MW renovable desplaza gas directamente.</p>
-<p class="note">ℹ️ Promedios anuales: en horas pico de invierno el déficit real es mayor.</p>
-</div>
+<p class="note">Son promedios anuales: en horas pico de invierno el déficit real es mayor.</p>
+</details>
 </div>
 </section>
 
 <section id="p-fuel" class="view" hidden>
-<div class="card">
+<div class="kpis k5" id="kp-fuel"></div>
+<div class="card big">
 <h2>⛽ Combustibles líquidos · <span class="yy"></span></h2>
-<div class="status" id="st-fuel"></div>
+<p class="sub">Millones de litros por día: producción nacional, importación y faltante por falta de divisas.</p>
 <div class="seg"><button type="button" id="bD" aria-pressed="true">Diésel</button><button type="button" id="bG" aria-pressed="false">Gasolina</button></div>
 <div class="key" id="k3"></div>
 <div class="fig"><svg id="g3" role="img" aria-label="Abastecimiento de combustible"></svg></div>
@@ -281,19 +289,36 @@ table.thr td:first-child{width:1%;white-space:nowrap}
 <div class="card">
 <h2>💵 Divisas y factura energética</h2>
 <p class="sub">Millones de US$ por año: lo que se necesita importar frente a lo que se puede pagar.</p>
+<div class="key" id="k4"></div>
 <div class="fig small"><svg id="g4" role="img" aria-label="Factura y divisas"></svg></div>
 </div>
 <div class="card">
-<h2>📖 ¿Qué significa?</h2>
+<h2>📉 Niveles de abastecimiento</h2>
+<p class="sub">Porcentaje de la demanda que llega al mercado en el año de análisis.</p>
+<table class="thr" id="thr-fuel"><tbody>
+<tr data-l="ok"><td><span class="b ok">≥ 99 %</span></td><td>Abastecido</td><td class="here"></td></tr>
+<tr data-l="warn"><td><span class="b warn">90 – 99 %</span></td><td>Filas</td><td class="here"></td></tr>
+<tr data-l="bad"><td><span class="b bad">75 – 90 %</span></td><td>Escasez</td><td class="here"></td></tr>
+<tr data-l="crit"><td><span class="b crit">&lt; 75 %</span></td><td>Crítico</td><td class="here"></td></tr>
+</tbody></table>
+<details><summary>Ver modelo y fórmulas</summary>
 <div class="formula">Factura = Diésel × P<sub>d</sub> + Gasolina × P<sub>g</sub> + Gas × P<sub>gas</sub></div>
 <div class="formula">Cobertura = min(1, (Divisas + Export. gas) ÷ Factura)</div>
-<table class="thr"><tbody>
-<tr><td><span class="b ok">≥ 99 %</span></td><td>Abastecido</td></tr>
-<tr><td><span class="b warn">90 – 99 %</span></td><td>Filas</td></tr>
-<tr><td><span class="b bad">75 – 90 %</span></td><td>Escasez</td></tr>
-<tr><td><span class="b crit">&lt; 75 %</span></td><td>Crítico</td></tr>
-</tbody></table>
+<p>La refinación nacional sigue al condensado, que cae con el gas. Si la factura supera las divisas disponibles más los ingresos por exportar gas, todas las importaciones se recortan en la misma proporción.</p>
+</details>
 </div>
+</div>
+<div class="card">
+<h2>💲 Precios internos y subvención · <span class="yy"></span></h2>
+<p class="sub">Precio regulado frente al costo de importar. Un margen negativo es subvención que paga el Estado.</p>
+<div class="scroll"><table id="prices"></table></div>
+<p class="note" id="pricenote"></p>
+<details><summary>Ver supuestos de precio</summary>
+<div class="formula">Demanda = Demanda base × (Precio interno ÷ Precio de referencia)<sup>elasticidad</sup></div>
+<div class="formula">Subvención = max(0, Costo importado − Precio interno sin IVA) × Litros importados</div>
+<p>La demanda base se calibró con datos de agosto de 2026, cuando el diésel costaba Bs 9,80 y la gasolina Bs 6,96; esos son los precios de referencia. Una elasticidad de −0,15 significa que un precio 10 % más alto reduce el consumo registrado ~1,5 %, incluido el contrabando que deja de salir del país.</p>
+<p class="note">Subir el precio en bolivianos reduce el consumo y la subvención, pero no crea dólares: si las divisas no alcanzan, la escasez sigue. El efecto sobre las divisas viene solo por el menor volumen importado.</p>
+</details>
 </div>
 </section>
 
@@ -302,23 +327,32 @@ table.thr td:first-child{width:1%;white-space:nowrap}
 <h2>🎯 Decision Layer · comparación de escenarios</h2>
 <p class="sub">Los cuatro escenarios con la casilla de importación actual. Puntaje de seguridad: 100 = sin déficit en ningún sector hasta 2040.</p>
 <div class="scroll"><table id="dec"></table></div>
-</div>
-<div class="card">
-<h2>📊 ¿Qué es la seguridad energética?</h2>
-<h3>Definición</h3>
-<p>Un escenario es seguro cuando el país cubre su gas, su electricidad y sus combustibles sin recortes, y puede pagar lo que importa.</p>
-<h3>Fórmula</h3>
-<div class="formula">Puntaje = 100 − 200 × (0,40 · Gas faltante + 0,35 · Electricidad no servida + 0,25 · Diésel faltante)</div>
-<p class="sub">Cada término es el promedio 2026–2040 como fracción de su demanda. Un déficit medio de 10 % resta 20 puntos. Seguridad: alta ≥ 85, media 70–85, baja 50–70, crítica &lt; 50.</p>
-<h3>Base teórica</h3>
-<p>Disponibilidad física, asequibilidad y resiliencia: las tres dimensiones de seguridad energética que usan la AIE y la literatura de economía de la energía.</p>
+<details><summary>¿Cómo se calcula el puntaje?</summary>
+<p>Un escenario es seguro cuando el país cubre su gas, su electricidad, su diésel y su gasolina sin recortes, y puede pagar lo que importa.</p>
+<div class="formula">Puntaje = 100 − 200 × (0,35 · Gas faltante + 0,30 · Electricidad no servida + 0,20 · Diésel faltante + 0,15 · Gasolina faltante)</div>
+<p class="sub">Cada término es el promedio 2026–2040 como fracción de su demanda. Un déficit medio de 10 % resta 20 puntos. Seguridad: alta ≥ 85, media 70–85, baja 50–70, crítica &lt; 50. Se basa en tres dimensiones de la seguridad energética: disponibilidad física, asequibilidad y resiliencia.</p>
+</details>
 </div>
 <div class="card">
 <h2>📈 Resultados año por año</h2>
-<p class="sub">Escenario activo.</p>
+<p class="sub">Escenario activo. La fila resaltada es el año de análisis.</p>
 <div class="scroll"><table id="tbl"></table></div>
 </div>
-
+<div class="card">
+<h2>📚 Datos de partida y fuentes</h2>
+<details open><summary>Valores de calibración (2025–2026)</summary>
+<ul>
+<li>Producción de gas ~25 MMm³/d a inicios de 2026, frente a ~61 en 2014 (Fundación Jubileo, Correo del Sur).</li>
+<li>Reservas al cierre de 2025: 1P 2,30 TCF; 2P 2,76; 3P 3,24 (certificación GLJ, YPFB).</li>
+<li>Mercado interno ~15 MMm³/d; exportación a Brasil 7–8 MMm³/d (YPFB, jul. 2026). Termoeléctricas ~6,5 MMm³/d de promedio.</li>
+<li>Electricidad: ~60–70 % térmica a gas; ~27–32 % hidro; demanda máxima ~1.800 MW (CNDC, CBE).</li>
+<li>Combustibles: ~200 M L/mes de diésel y ~140 M L/mes de gasolina; se importa ~90 % del diésel y ~56 % de la gasolina (YPFB, ago. 2026).</li>
+<li>Precios: diésel Bs 20,57/L desde el 24/11/2026 bajo el DS 5716, que lo ajusta según la referencia internacional (antes Bs 17,95); gasolina especial Bs 6,96/L (DS 5516). Tipo de cambio de referencia Bs 11,64 por US$.</li>
+<li>Advertencias públicas: importación de gas entre 2028 y 2031 (CBHE, Jubileo, YPFB).</li>
+</ul>
+<p class="sub">Modelo simplificado para análisis de escenarios, no un pronóstico oficial. Todos los supuestos son editables.</p>
+</details>
+</div>
 </section>
 
 </div>
@@ -333,10 +367,10 @@ table.thr td:first-child{width:1%;white-space:nowrap}
 <p class="ver">v1.0 · 24 de noviembre de 2026</p>
 </div>
 <div class="chain" aria-label="Cadena que modela EnergyBalance">
-<div class="node"><i style="background:#1240e0"></i><b>Gas</b><span>Reservas y declinación de campos</span></div>
-<div class="node"><i style="background:#4fb3d9"></i><b>Electricidad</b><span>Despacho hidro, renovable y térmico</span></div>
-<div class="node"><i style="background:#2cc4b5"></i><b>Combustibles</b><span>Refinación e importación</span></div>
-<div class="node"><i style="background:#d52b1e"></i><b>Divisas</b><span>Lo que el país puede pagar</span></div>
+<div class="node"><i style="background:#4e79a7"></i><b>Gas</b><span>Reservas y declinación de campos</span></div>
+<div class="node"><i style="background:#e3c35a"></i><b>Electricidad</b><span>Despacho hidro, renovable y térmico</span></div>
+<div class="node"><i style="background:#e8964a"></i><b>Combustibles</b><span>Refinación e importación</span></div>
+<div class="node"><i style="background:#d65f58"></i><b>Divisas</b><span>Lo que el país puede pagar</span></div>
 </div>
 </div></section>
 
@@ -411,12 +445,11 @@ table.thr td:first-child{width:1%;white-space:nowrap}
 <p class="f1">Stratus Dynamics · EnergyBalance · © 2026 | MSc. Daniel Canedo</p>
 <p class="f2">4-Layer Architecture: Data → Research → Decision → Intelligence</p>
 </footer>
-
 <script>
 {
 const Y0=2026,N=15,YRS=Array.from({length:N},(_,i)=>Y0+i);
 const RES={"1P":2.30,"2P":2.76,"3P":3.24};
-const DEF={dec:10,res:"2P",newQ:0,newY:2029,eg:4,hyd:100,ren:100,eff:0,fg:2.5,fx:3500,pD:1.25,pG:1.10,pGi:9,pGe:8,expCap:10,impCap:10};
+const DEF={dec:10,res:"2P",newQ:0,newY:2029,eg:4,hyd:100,ren:100,eff:0,fg:2.5,fx:3500,pD:1.25,pG:1.10,pGi:9,pGe:8,expCap:10,impCap:10,prD:20.57,prG:6.96,tc:11.64,el:-0.15};
 const PRE={
  "Inercial":{},
  "Reactivación upstream":{dec:8,newQ:8,newY:2029,ren:150},
@@ -439,6 +472,12 @@ const CTL=[
  ["Combustibles y divisas"],
  ["fg","Crecimiento demanda combustibles",-2,6,0.5,v=>v+" %/año","Menor tras quitar subsidios"],
  ["fx","Divisas para importar energía",1500,8000,100,v=>"US$ "+v.toLocaleString("es-BO")+" M/año","Sin contar ingresos por exportar gas"],
+ ["Precios internos"],
+ ["prD","Precio interno diésel",9.8,30,0.01,v=>"Bs "+v.toFixed(2)+"/L","DS 5716 · vigente desde el 24/11/2026"],
+ ["prG","Precio interno gasolina especial",6.96,20,0.01,v=>"Bs "+v.toFixed(2)+"/L","DS 5516"],
+ ["tc","Tipo de cambio",6.96,20,0.01,v=>"Bs "+v.toFixed(2)+" por US$",""],
+ ["el","Elasticidad precio de la demanda",-0.5,0,0.01,v=>v.toFixed(2),"Cuánto baja el consumo (y el contrabando) al subir el precio"],
+ ["Costos de importación"],
  ["pD","Precio diésel importado",0.7,1.6,0.05,v=>"US$ "+v.toFixed(2)+"/L","Puesto en Bolivia"],
  ["pG","Precio gasolina importada",0.6,1.5,0.05,v=>"US$ "+v.toFixed(2)+"/L",""],
  ["pGi","Precio gas importado",5,15,0.5,v=>"US$ "+v+"/MMBtu",""],
@@ -471,7 +510,8 @@ function model(p,imp){
   const expRev=expo*MMBTU*p.pGe;
   const gImpW=imp?Math.min(p.impCap,gap):0;
   const liq=sup/25;
-  const dD=7.0*Math.pow(1+p.fg/100,t),dG=4.6*Math.pow(1+p.fg/100,t);
+  const eD=Math.pow(p.prD/9.80,p.el),eG=Math.pow(p.prG/6.96,p.el);
+  const dD=7.0*eD*Math.pow(1+p.fg/100,t),dG=4.6*eG*Math.pow(1+p.fg/100,t);
   const nD=Math.min(dD,0.7*liq),nG=Math.min(dG,2.0*liq);
   const iDW=dD-nD,iGW=dG-nG;
   const billW=(iDW*p.pD+iGW*p.pG)*365+gImpW*MMBTU*p.pGi;
@@ -479,14 +519,24 @@ function model(p,imp){
   const r=billW>0?Math.min(1,avail/billW):1;
   const gImp=gImpW*r,iD=iDW*r,iG=iGW*r;
   const short=Math.max(0,gap-gImp);
+  const cD=p.pD*p.tc,cG=p.pG*p.tc,xD=p.prD/1.13,xG=p.prG/1.13;
+  const subD=Math.max(0,cD-xD)*iD*365/p.tc,subG=Math.max(0,cG-xG)*iG*365/p.tc;
   const shPow=dom>0?short*gPow/dom:0;
   const thE=gPow>0?thN*(1-shPow/gPow):0;
   const uns=thN-thE;
-  out.push({y,ex,nw,sup,gImp,short,dom,win:dom*1.12,expo,E,hy,rn,thE,uns,uP:uns/E*100,
+  out.push({y,ex,nw,sup,gImp,gImpW,gap,short,dom,win:dom*1.12,expo,expRev,E,hy,rn,thE,uns,uP:uns/E*100,
    dD,dG,nD,nG,iD,iG,fD:dD-nD-iD,fG:dG-nG-iG,bill:billW*r,billW,avail,r,cov:sup/dom,
-   dCov:(nD+iD)/dD*100});
+   dCov:(nD+iD)/dD*100,gCov:(nG+iG)/dG*100,cD,cG,xD,xG,subD,subG,eD,eG});
  }
  return out;
+}
+function cause(o){
+ if(o.short<0.05)return "";
+ const imp=$("imp").checked;
+ if(!imp)return "Falta gas y la importación no está permitida.";
+ if(o.gImpW>=P.impCap-1e-6&&o.r>=0.999)return "Falta gas: la capacidad de importación está al tope.";
+ if(o.r<0.999)return "Falta gas: no alcanzan las divisas para importarlo.";
+ return "Falta gas.";
 }
 
 const ST={
@@ -496,93 +546,131 @@ const ST={
  fx:r=>r>=0.999?["ok","CUBIERTA"]:r>=0.9?["warn","AJUSTADA"]:r>=0.7?["bad","DÉFICIT"]:["crit","CRÍTICO"]
 };
 const badge=([c,t])=>`<span class="b ${c}">${t}</span>`;
+const kv=(v,l,b,bad)=>`<div class="kv${bad?" bad":""}"><b>${v}</b><span>${l}</span>${b?"<br>"+badge(b):""}</div>`;
 
-function axes(W,H,m,max,step,unit,narrow){
- let s="";
- for(let v=0;v<=max+1e-9;v+=step){const yy=m.t+(H-m.t-m.b)*(1-v/max);
-  s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text x="${m.l-6}" y="${yy+4}" text-anchor="end">${fmt(v,0)}</text>`}
- YRS.forEach((y,i)=>{if(narrow?i%4:i%2)return;const xx=m.l+(W-m.l-m.r)*(i+.5)/N;s+=`<text x="${xx}" y="${H-m.b+18}" text-anchor="middle">${y}</text>`});
- return s+`<text x="${m.l-6}" y="${m.t-8}" text-anchor="end">${unit}</text>`;
-}
+// ---------- charts ----------
 function nice(v){const c=[1,2,2.5,5,10];const p=Math.pow(10,Math.floor(Math.log10(v/5)));for(const k of c)if(v/(k*p)<=6)return k*p;return 10*p}
-function bars(svg,series,lines,unit,ml){
- const W=svg.clientWidth,H=svg.clientHeight;if(!W||!H)return;
- const narrow=W<520,m={l:ml||40,r:narrow?12:110,t:24,b:28};
- let max=0;R.forEach(o=>{const s=series.reduce((a,se)=>a+se.v(o),0);max=Math.max(max,s,...lines.map(l=>l.v(o)))});
- const st=nice(max*1.05);max=Math.ceil(max*1.05/st)*st;
- const pw=W-m.l-m.r,ph=H-m.t-m.b,bw=pw/N*.72,Y=v=>m.t+ph*(1-v/max),X=i=>m.l+pw*(i+.5)/N;
- let s=axes(W,H,m,max,st,unit,narrow);
- const ia=YA-Y0;s+=`<rect x="${X(ia)-pw/N/2}" y="${m.t}" width="${pw/N}" height="${ph}" fill="var(--zone)"/>`;
- R.forEach((o,i)=>{let acc=0;series.forEach(se=>{const v=se.v(o);if(v<=0)return;s+=`<rect x="${X(i)-bw/2}" y="${Y(acc+v)}" width="${bw}" height="${Y(acc)-Y(acc+v)}" rx="1.5" fill="${se.c}"><title>${o.y} · ${se.n}: ${fmt(v)}</title></rect>`;acc+=v})});
- lines.forEach(l=>{const d=R.map((o,i)=>(i?"L":"M")+X(i)+","+Y(l.v(o))).join("");s+=`<path d="${d}" fill="none" stroke="${l.c}" stroke-width="2.5" ${l.dash?'stroke-dasharray="6 4"':""}/>`;
-  if(!narrow)s+=`<text class="lab" x="${X(N-1)+bw/2+6}" y="${Y(l.v(R[N-1]))+4}">${l.n}</text>`});
- if(!narrow){let acc=0;series.forEach(se=>{const v=se.v(R[N-1]);if(v>max*.06)s+=`<text x="${X(N-1)+bw/2+6}" y="${Y(acc+v/2)+4}">${se.n}</text>`;acc+=v})}
- s+=`<text class="lab" x="${X(ia)}" y="${m.t-8}" text-anchor="middle">${YA}</text>`;
+function frame(svg,ml,maxV,unit){
+ const W=svg.clientWidth,H=svg.clientHeight;if(!W||!H)return null;
+ const narrow=W<520,m={l:ml||44,r:narrow?12:110,t:24,b:28};
+ const st=nice(maxV*1.05),max=Math.ceil(maxV*1.05/st)*st;
+ const pw=W-m.l-m.r,ph=H-m.t-m.b,cw=pw/N,bw=cw*.68,Y=v=>m.t+ph*(1-v/max),X=i=>m.l+cw*(i+.5);
+ let s="";
+ for(let v=0;v<=max+1e-9;v+=st){const yy=Y(v);s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text x="${m.l-6}" y="${yy+4}" text-anchor="end">${fmt(v,0)}</text>`}
+ YRS.forEach((y,i)=>{if(narrow?i%4:i%2)return;s+=`<text x="${X(i)}" y="${H-m.b+18}" text-anchor="middle">${y}</text>`});
+ s+=`<text x="${m.l-6}" y="${m.t-8}" text-anchor="end">${unit}</text>`;
+ const ia=YA-Y0;s+=`<rect x="${X(ia)-cw/2}" y="${m.t}" width="${cw}" height="${ph}" fill="var(--zone)"/><text class="lab" x="${X(ia)}" y="${m.t-8}" text-anchor="middle">${YA}</text>`;
+ return {W,H,m,pw,ph,cw,bw,X,Y,max,narrow,s};
+}
+function hover(svg,F,tipFn){
+ const fig=svg.parentNode;let tip=fig.querySelector(".tip");
+ if(!tip){tip=document.createElement("div");tip.className="tip";fig.appendChild(tip)}
+ svg._F=F;svg._tip=tipFn;
+ if(svg._bound)return;svg._bound=1;
+ const move=e=>{const F=svg._F;if(!F)return;const rc=svg.getBoundingClientRect(),x=e.clientX-rc.left;
+  const i=Math.floor((x-F.m.l)/F.cw);if(i<0||i>=N){hide();return}
+  const o=R[i];tip.innerHTML=svg._tip(o);tip.style.display="block";
+  const hl=svg.querySelector(".hov");if(hl){hl.setAttribute("x",F.X(i)-F.cw/2);hl.style.display="block"}
+  const tw=tip.offsetWidth,fx=fig.clientWidth;let left=F.X(i)+F.cw/2+8;if(left+tw>fx)left=F.X(i)-F.cw/2-8-tw;tip.style.left=Math.max(0,left)+"px";tip.style.top="8px"};
+ const hide=()=>{tip.style.display="none";const hl=svg.querySelector(".hov");if(hl)hl.style.display="none"};
+ svg.addEventListener("pointermove",move);svg.addEventListener("pointerdown",move);svg.addEventListener("pointerleave",hide);
+}
+const row=(c,n,v)=>`<div><span>${c?`<i style="background:${c}"></i>`:""}${n}</span><b>${v}</b></div>`;
+function bars(svg,series,lines,unit,tipFn,ml){
+ let maxV=0;R.forEach(o=>{maxV=Math.max(maxV,series.reduce((a,se)=>a+se.v(o),0),...lines.map(l=>l.v(o)))});
+ const F=frame(svg,ml,maxV,unit);if(!F)return;let s=F.s;
+ s+=`<rect class="hov" y="${F.m.t}" width="${F.cw}" height="${F.ph}" fill="none" stroke="var(--mute)" stroke-dasharray="3 3" style="display:none"/>`;
+ R.forEach((o,i)=>{let acc=0;series.forEach(se=>{const v=se.v(o);if(v<=0)return;s+=`<rect x="${F.X(i)-F.bw/2}" y="${F.Y(acc+v)}" width="${F.bw}" height="${F.Y(acc)-F.Y(acc+v)}" rx="1.5" fill="${se.c}"/>`;acc+=v})});
+ lines.forEach(l=>{const d=R.map((o,i)=>(i?"L":"M")+F.X(i)+","+F.Y(l.v(o))).join("");s+=`<path d="${d}" fill="none" stroke="${l.c}" stroke-width="2" ${l.dash?'stroke-dasharray="6 4"':""}/>`;
+  if(!F.narrow)s+=`<text class="lab" x="${F.X(N-1)+F.bw/2+6}" y="${F.Y(l.v(R[N-1]))+4}">${l.n}</text>`});
+ if(!F.narrow){let acc=0;series.forEach(se=>{const v=se.v(R[N-1]);if(v>F.max*.06)s+=`<text x="${F.X(N-1)+F.bw/2+6}" y="${F.Y(acc+v/2)+4}">${se.n}</text>`;acc+=v})}
+ svg.innerHTML=s;hover(svg,F,tipFn);
+}
+function pctStrip(svg){
+ const maxV=Math.max(12,...R.map(o=>o.uP));
+ const F=frame(svg,44,maxV,"%");if(!F)return;let s=F.s;
+ const band=(a,b,c)=>{const y1=F.Y(Math.min(b,F.max)),y2=F.Y(a);s+=`<rect x="${F.m.l}" y="${y1}" width="${F.pw}" height="${y2-y1}" fill="${c}" opacity=".10"/>`};
+ band(0,2,"var(--sol)");band(2,10,"var(--imp)");band(10,F.max,"var(--red)");
+ [[2,"2 % cortes"],[10,"10 % crisis"]].forEach(([v,t])=>{s+=`<line x1="${F.m.l}" x2="${F.m.l+F.pw}" y1="${F.Y(v)}" y2="${F.Y(v)}" stroke="var(--mute)" stroke-dasharray="4 4"/>`;if(!F.narrow)s+=`<text x="${F.m.l+F.pw+6}" y="${F.Y(v)+4}">${t}</text>`});
+ s+=`<rect class="hov" y="${F.m.t}" width="${F.cw}" height="${F.ph}" fill="none" stroke="var(--mute)" stroke-dasharray="3 3" style="display:none"/>`;
+ R.forEach((o,i)=>{if(o.uP>0.01)s+=`<rect x="${F.X(i)-F.bw/2}" y="${F.Y(o.uP)}" width="${F.bw}" height="${F.Y(0)-F.Y(o.uP)}" rx="1.5" fill="var(--red)"/>`});
  svg.innerHTML=s;
+ hover(svg,F,o=>`<b class="t">${o.y}</b>${row("var(--red)","No servida",fmt(o.uP)+" %")}<div><span>Estado</span>${badge(ST.power(o.uP))}</div>`);
 }
 function key(id,arr){$(id).innerHTML=arr.map(([n,c,d])=>`<span><i style="background:${c};${d?"height:3px;vertical-align:3px":""}"></i>${n}</span>`).join("")}
 
-const S1=[{n:"Campos existentes",c:"var(--co)",v:o=>o.ex},{n:"Nuevos hallazgos",c:"var(--co2)",v:o=>o.nw},{n:"Gas importado",c:"var(--amb)",v:o=>o.gImp},{n:"Faltante",c:"var(--red)",v:o=>o.short}];
-const L1=[{n:"Demanda interna",c:"var(--ink)",v:o=>o.dom},{n:"Invierno",c:"var(--ink)",v:o=>o.win,dash:1}];
-const S2=[{n:"Hidro",c:"var(--hyd)",v:o=>o.hy},{n:"Renovables",c:"var(--sol)",v:o=>o.rn},{n:"Térmica a gas",c:"var(--co)",v:o=>o.thE},{n:"No servida",c:"var(--red)",v:o=>o.uns}];
-const S3=()=>fuel==="D"?[{n:"Nacional",c:"var(--co)",v:o=>o.nD},{n:"Importado",c:"var(--amb)",v:o=>o.iD},{n:"Faltante",c:"var(--red)",v:o=>o.fD}]:[{n:"Nacional",c:"var(--co)",v:o=>o.nG},{n:"Importada",c:"var(--amb)",v:o=>o.iG},{n:"Faltante",c:"var(--red)",v:o=>o.fG}];
-const S4=[{n:"Factura pagada",c:"var(--amb)",v:o=>o.bill},{n:"Sin pagar",c:"var(--red)",v:o=>o.billW-o.bill}];
+const S1=[{n:"Campos existentes",c:"var(--gas)",v:o=>o.ex},{n:"Nuevos hallazgos",c:"var(--gas2)",v:o=>o.nw},{n:"Gas importado",c:"var(--imp)",v:o=>o.gImp},{n:"Faltante",c:"var(--red)",v:o=>o.short}];
+const L1=[{n:"Demanda interna",c:"var(--ink)",v:o=>o.dom},{n:"Invierno",c:"var(--mute)",v:o=>o.win,dash:1}];
+const S2=[{n:"Hidro",c:"var(--hyd)",v:o=>o.hy},{n:"Renovables",c:"var(--sol)",v:o=>o.rn},{n:"Térmica a gas",c:"var(--gas)",v:o=>o.thE},{n:"No servida",c:"var(--red)",v:o=>o.uns}];
+const S3=()=>fuel==="D"?[{n:"Nacional",c:"var(--gas)",v:o=>o.nD},{n:"Importado",c:"var(--imp)",v:o=>o.iD},{n:"Faltante",c:"var(--red)",v:o=>o.fD}]:[{n:"Nacional",c:"var(--gas)",v:o=>o.nG},{n:"Importada",c:"var(--imp)",v:o=>o.iG},{n:"Faltante",c:"var(--red)",v:o=>o.fG}];
+const S4=[{n:"Factura pagada",c:"var(--imp)",v:o=>o.bill},{n:"Sin pagar",c:"var(--red)",v:o=>o.billW-o.bill}];
 const L4=[{n:"Divisas",c:"var(--ink)",v:o=>o.avail}];
-key("k1",S1.map(s=>[s.n,s.c]).concat([["Demanda interna","var(--ink)",1],["Invierno (punteada)","var(--ink)",1]]));
+const k1=S1.map(s=>[s.n,s.c]).concat([["Demanda interna","var(--ink)",1],["Invierno (punteada)","var(--mute)",1]]);
+key("k1",k1);key("k1b",k1);
 key("k2",S2.map(s=>[s.n==="Renovables"?"Solar, eólica, biomasa y nueva hidro":s.n,s.c]));
-const D={g1:()=>bars($("g1"),S1,L1,"MMm³/d"),g1b:()=>bars($("g1b"),S1,L1,"MMm³/d"),g2:()=>bars($("g2"),S2,[],"TWh"),
- g3:()=>{key("k3",S3().map(s=>[s.n,s.c]));bars($("g3"),S3(),[],"M L/d")},g4:()=>bars($("g4"),S4,L4,"US$ M",52)};
+key("k4",S4.map(s=>[s.n,s.c]).concat([["Divisas disponibles","var(--ink)",1]]));
+
+const T1=o=>`<b class="t">${o.y}</b>${row("var(--gas)","Campos existentes",fmt(o.ex))}${o.nw>0.01?row("var(--gas2)","Nuevos hallazgos",fmt(o.nw)):""}${row("var(--imp)","Importado",fmt(o.gImp))}${row("var(--red)","Faltante",fmt(o.short))}<hr>${row("","Demanda interna",fmt(o.dom))}${row("","Demanda en invierno",fmt(o.win))}${row("","Exportación",fmt(o.expo))}${row("","Cobertura",fmt(o.cov,2))}<p>MMm³/d. ${cause(o)}</p>`;
+const T2=o=>`<b class="t">${o.y}</b>${row("var(--hyd)","Hidro",fmt(o.hy,2))}${row("var(--sol)","Renovables",fmt(o.rn,2))}${row("var(--gas)","Térmica a gas",fmt(o.thE,2))}${row("var(--red)","No servida",fmt(o.uns,2)+" ("+fmt(o.uP)+" %)")}<hr>${row("","Demanda",fmt(o.E,2))}<p>TWh. ${o.uP>0.05?cause(o).replace("Falta gas","Limitada por gas"):"Demanda cubierta."}</p>`;
+const T3=o=>{const d=fuel==="D",dem=d?o.dD:o.dG,n=d?o.nD:o.nG,i=d?o.iD:o.iG,f=d?o.fD:o.fG,c=d?o.dCov:o.gCov;
+ return `<b class="t">${o.y} · ${d?"Diésel":"Gasolina"}</b>${row("var(--gas)","Nacional",fmt(n,2))}${row("var(--imp)","Importado",fmt(i,2))}${row("var(--red)","Faltante",fmt(f,2))}<hr>${row("","Demanda",fmt(dem,2))}${row("","Abastecido",fmt(c,0)+" %")}<p>Millones de litros por día.${f>0.01?" Faltante por falta de divisas.":""}</p>`};
+const T4=o=>`<b class="t">${o.y}</b>${row("var(--imp)","Pagada",fmt(o.bill,0))}${row("var(--red)","Sin pagar",fmt(o.billW-o.bill,0))}<hr>${row("","Factura total",fmt(o.billW,0))}${row("","Divisas disponibles",fmt(o.avail,0))}${row("","De ellas, export. gas",fmt(o.expRev,0))}<p>Millones de US$.</p>`;
+
+const D={g1:()=>bars($("g1"),S1,L1,"MMm³/d",T1),g1b:()=>bars($("g1b"),S1,L1,"MMm³/d",T1),g2:()=>bars($("g2"),S2,[],"TWh",T2),g5:()=>pctStrip($("g5")),
+ g3:()=>{key("k3",S3().map(s=>[s.n,s.c]));bars($("g3"),S3(),[],"M L/d",T3)},g4:()=>bars($("g4"),S4,L4,"US$ M",T4,56)};
 const ro=new ResizeObserver(es=>es.forEach(e=>D[e.target.id]&&D[e.target.id]()));
 Object.keys(D).forEach(id=>ro.observe($(id)));
 const drawAll=()=>Object.values(D).forEach(f=>f());
 
 function firstYear(f){const o=R.find(f);return o?o.y:null}
+function mark(id,items){const t=$(id);t.querySelectorAll("tr").forEach(tr=>{const hits=items.filter(([l])=>l===tr.dataset.l).map(x=>x[1]);tr.classList.toggle("on",hits.length>0);tr.querySelector(".here").textContent=hits.length?"← "+hits.join(", "):""})}
+
 function render(){
- const o=R[YA-Y0];
+ const o=R[YA-Y0],imp=$("imp").checked;
  document.querySelectorAll(".yy").forEach(e=>e.textContent=YA);
- const sg=ST.gas(o.cov),sp=ST.power(o.uP),sf=ST.fuel(o.dCov),sx=ST.fx(o.r);
- $("uni").innerHTML=[["🔥 Gas","#gas",sg,"Cobertura "+fmt(o.cov,2)],["⚡ Electricidad","#electricidad",sp,fmt(o.uP)+" % no servida"],["⛽ Diésel","#combustibles",sf,fmt(o.dCov,0)+" % abastecido"],["💵 Divisas","#combustibles",sx,fmt(o.r*100,0)+" % de la factura"]]
+ const sg=ST.gas(o.cov),sp=ST.power(o.uP),sf=ST.fuel(o.dCov),sgl=ST.fuel(o.gCov),sx=ST.fx(o.r);
+ $("ctx").innerHTML=`<span class="chip">Escenario <b>${active||"Personalizado"}</b></span><span class="chip">Año <b>${YA}</b></span><span class="chip ${imp?"on":"off"}"><i></i>Importación de gas <b>${imp?"permitida · hasta "+fmt(P.impCap,0)+" MMm³/d":"no permitida"}</b></span><span class="chip">Divisas <b>US$ ${fmt(P.fx,0)} M/año</b></span><span class="chip">Diésel <b>Bs ${fmt(P.prD,2)}/L</b></span><span class="chip">Gasolina <b>Bs ${fmt(P.prG,2)}/L</b></span>`;
+ $("uni").innerHTML=[["🔥 Gas","#gas",sg,"Cobertura "+fmt(o.cov,2)],["⚡ Electricidad","#electricidad",sp,fmt(o.uP)+" % no servida"],["🚛 Diésel","#combustibles",sf,fmt(o.dCov,0)+" % abastecido"],["⛽ Gasolina","#combustibles",sgl,fmt(o.gCov,0)+" % abastecida"],["💵 Divisas","#combustibles",sx,fmt(o.r*100,0)+" % de la factura"]]
   .map(([n,h,s,v])=>`<a href="${h}"><b>${n}</b>${badge(s)}<span class="v">${v}</span></a>`).join("");
- const cross=firstYear(x=>x.dom>x.sup),win=firstYear(x=>x.win>x.sup),noexp=firstYear(x=>x.expo<0.5);
+ const cross=firstYear(x=>x.dom>x.sup),win=firstYear(x=>x.win>x.sup),noexp=firstYear(x=>x.expo<0.5),p2=firstYear(x=>x.uP>=2),d90=firstYear(x=>x.dCov<90),g90=firstYear(x=>x.gCov<90),fx1=firstYear(x=>x.r<0.999);
  const mx=R.reduce((a,x)=>x.uP>a.uP?x:a,R[0]);
  $("headline").textContent=cross?`Bolivia: el gas propio deja de alcanzar para el mercado interno en ${cross}`:"Bolivia: el gas propio alcanza para el mercado interno hasta 2040 en este escenario";
- $("kpis").innerHTML=[[cross||"> 2040","Demanda interna supera la producción",!!cross],[win||"> 2040","Primer invierno con déficit de gas",!!win],[noexp||"> 2040","Fin práctico de las exportaciones",false],
-  [mx.uP>0.05?fmt(mx.uP)+" %":"0 %","Electricidad no servida, peor año"+(mx.uP>0.05?" ("+mx.y+")":""),mx.uP>0.05],["US$ "+fmt(o.billW,0)+" M","Factura energética "+YA,false],[fmt(o.dCov,0)+" %","Diésel abastecido en "+YA,o.dCov<99]]
-  .map(([v,l,b])=>`<div class="kv${b?" bad":""}"><b>${v}</b><span>${l}</span></div>`).join("");
- // brief
- const nStress=[sg,sp,sf,sx].filter(s=>s[0]!=="ok").length;
- $("brief1").textContent=`En ${YA}, ${nStress===0?"ningún sector muestra estrés":nStress===1?"1 de 4 sectores muestra estrés":nStress+" de 4 sectores muestran estrés"}. La producción propia de gas sería de ${fmt(o.sup)} MMm³/d frente a una demanda interna de ${fmt(o.dom)} MMm³/d (cobertura ${fmt(o.cov,2)}). Un sector está en estrés cuando su indicador sale del rango normal definido en cada pestaña.`;
- const lines=[];
- lines.push(`<p><b>Gas:</b> ${badge(sg)} ${o.expo>0.5?`exporta ${fmt(o.expo)} MMm³/d.`:o.gImp>0.05?`importa ${fmt(o.gImp)} MMm³/d${o.short>0.05?` y aún faltan ${fmt(o.short)}`:""}.`:o.short>0.05?`faltan ${fmt(o.short)} MMm³/d.`:"autosuficiente sin excedente."}</p>`);
- lines.push(`<p><b>Electricidad:</b> ${badge(sp)} ${fmt(o.thE/o.E*100,0)} % térmica; ${o.uP>0.05?`${fmt(o.uns,2)} TWh no servidos (${fmt(o.uP)} %).`:"demanda cubierta en promedio anual."}</p>`);
- lines.push(`<p><b>Diésel:</b> ${badge(sf)} ${fmt(o.dCov,0)} % de la demanda abastecida; ${fmt((o.dD-o.nD)/o.dD*100,0)} % depende de importación.</p>`);
- lines.push(`<p><b>Divisas:</b> ${badge(sx)} factura de US$ ${fmt(o.billW,0)} M frente a US$ ${fmt(o.avail,0)} M disponibles.</p>`);
- $("brief2").innerHTML=lines.join("");
- // signals
- const sig=[["🔥","Gas","Demanda interna supera la producción",cross],["❄️","Gas · invierno","Déficit en época seca",win],["⚡","Electricidad","Más de 2 % de energía no servida",firstYear(x=>x.uP>=2)],["⛽","Diésel","Abastecimiento bajo 90 %",firstYear(x=>x.dCov<90)],["💵","Divisas","La factura supera lo disponible",firstYear(x=>x.r<0.999)]]
+ $("kpis").innerHTML=[kv(cross||"> 2040","Demanda interna supera la producción",0,!!cross),kv(win||"> 2040","Primer invierno con déficit de gas",0,!!win),kv(noexp||"> 2040","Fin práctico de las exportaciones"),
+  kv(mx.uP>0.05?fmt(mx.uP)+" %":"0 %","Electricidad no servida, peor año"+(mx.uP>0.05?" ("+mx.y+")":""),0,mx.uP>0.05),kv("US$ "+fmt(o.billW,0)+" M","Factura energética "+YA),
+  kv(fmt(o.dCov,0)+" %","Diésel abastecido en "+YA,0,o.dCov<99),kv(fmt(o.gCov,0)+" %","Gasolina abastecida en "+YA,0,o.gCov<99),kv(fmt(o.r*100,0)+" %","Factura cubierta por divisas en "+YA,0,o.r<0.999)].join("");
+ const nStress=[sg,sp,sf,sgl,sx].filter(s=>s[0]!=="ok").length;
+ $("brief1").textContent=`En ${YA}, ${nStress===0?"ningún sector muestra estrés":nStress===1?"1 de 5 sectores muestra estrés":nStress+" de 5 sectores muestran estrés"}. La producción propia de gas sería de ${fmt(o.sup)} MMm³/d frente a una demanda interna de ${fmt(o.dom)} MMm³/d (cobertura ${fmt(o.cov,2)}). ${imp?"La importación de gas está permitida.":"La importación de gas no está permitida en este escenario."}`;
+ $("brief2").innerHTML=[`<p><b>Gas:</b> ${badge(sg)} ${o.expo>0.5?`exporta ${fmt(o.expo)} MMm³/d.`:o.gImp>0.05?`importa ${fmt(o.gImp)} MMm³/d${o.short>0.05?` y aún faltan ${fmt(o.short)}`:""}.`:o.short>0.05?`faltan ${fmt(o.short)} MMm³/d.`:"autosuficiente sin excedente."}</p>`,
+  `<p><b>Electricidad:</b> ${badge(sp)} ${fmt(o.thE/o.E*100,0)} % térmica; ${o.uP>0.05?`${fmt(o.uns,2)} TWh no servidos (${fmt(o.uP)} %).`:"demanda cubierta en promedio anual."}</p>`,
+  `<p><b>Diésel:</b> ${badge(sf)} ${fmt(o.dCov,0)} % abastecido; ${fmt((o.dD-o.nD)/o.dD*100,0)} % depende de importación.</p>`,
+  `<p><b>Gasolina:</b> ${badge(sgl)} ${fmt(o.gCov,0)} % abastecida; ${fmt((o.dG-o.nG)/o.dG*100,0)} % depende de importación.</p>`,
+  `<p><b>Divisas:</b> ${badge(sx)} factura de US$ ${fmt(o.billW,0)} M frente a US$ ${fmt(o.avail,0)} M disponibles.</p>`,
+  `<p><b>Precios:</b> diésel a Bs ${fmt(P.prD,2)}/L ${o.subD>0.5?`con subvención de US$ ${fmt(o.subD,0)} M`:"sin subvención"}; gasolina a Bs ${fmt(P.prG,2)}/L ${o.subG>0.5?`con subvención de US$ ${fmt(o.subG,0)} M`:"sin subvención"} en ${YA}.</p>`].join("");
+ const sig=[["🔥","Gas","Demanda interna supera la producción",cross],["❄️","Gas · invierno","Déficit en época seca",win],["⚡","Electricidad","2 % o más de energía no servida",p2],["🚛","Diésel","Abastecimiento bajo 90 %",d90],["⛽","Gasolina","Abastecimiento bajo 90 %",g90],["💵","Divisas","La factura supera lo disponible",fx1]]
   .sort((a,b)=>(a[3]||9999)-(b[3]||9999));
  $("signals").innerHTML=sig.map((s,i)=>`<div class="sig"><span class="n">#${i+1}</span><div><b>${s[0]} ${s[1]}</b><small>${s[2]}</small></div><span class="y" style="color:${s[3]?(s[3]<=YA?"var(--red)":"var(--ink)"):"var(--mute)"}">${s[3]||"> 2040"}</span></div>`).join("");
- // statuses
- $("st-gas").innerHTML=`${badge(sg)}<div class="s"><b>${fmt(o.sup)}</b><span>Producción MMm³/d</span></div><div class="s"><b>${fmt(o.dom)}</b><span>Demanda interna</span></div><div class="s"><b>${fmt(o.expo)}</b><span>Exportación</span></div><div class="s"><b>${fmt(o.gImp)}</b><span>Importación</span></div><div class="s"><b>${fmt(o.short)}</b><span>Faltante</span></div>`;
- $("st-power").innerHTML=`${badge(sp)}<div class="s"><b>${fmt(o.E)}</b><span>Demanda TWh</span></div><div class="s"><b>${fmt(o.thE/o.E*100,0)} %</b><span>Térmica</span></div><div class="s"><b>${fmt((o.hy+o.rn)/o.E*100,0)} %</b><span>Hidro y renovables</span></div><div class="s"><b>${fmt(o.uP)} %</b><span>No servida</span></div>`;
- $("st-fuel").innerHTML=`${badge(sf)}<div class="s"><b>${fmt(o.dD,2)}</b><span>Demanda diésel M L/d</span></div><div class="s"><b>${fmt(o.dCov,0)} %</b><span>Diésel abastecido</span></div><div class="s"><b>${fmt((o.nG+o.iG)/o.dG*100,0)} %</b><span>Gasolina abastecida</span></div><div class="s"><b>US$ ${fmt(o.billW,0)} M</b><span>Factura</span></div>`;
- const gauge=(id,val,lo,hi,txt,lab)=>{const p=Math.max(0,Math.min(1,(val-lo)/(hi-lo)))*100;$(id).innerHTML=`<div class="gv">${txt}</div><div class="track"><div class="pin" style="left:${p}%"></div></div><div class="gl"><span>${lab[0]}</span><span>${lab[1]}</span></div>`};
- gauge("gauge-gas",o.cov,0.4,1.6,fmt(o.cov,2),["0,4 crítico","1,6 holgado"]);
- gauge("gauge-power",-o.uP,-30,0,fmt(o.uP)+" %",["30 % crisis","0 % normal"]);
+ // tab KPI rows
+ $("kp-gas").innerHTML=kv(fmt(o.cov,2),"Cobertura de gas "+YA,sg)+kv(fmt(o.sup),"Producción propia, MMm³/d")+kv(fmt(o.dom),"Demanda interna, MMm³/d")+kv(o.expo>0.05?fmt(o.expo):fmt(o.gImp),o.expo>0.05?"Exportación, MMm³/d":"Importación, MMm³/d")+kv(cross||"> 2040","Primer año de déficit",0,!!cross);
+ $("kp-power").innerHTML=kv(fmt(o.uP)+" %","No servida en "+YA,sp,o.uP>0.05)+kv(fmt(o.thE/o.E*100,0)+" %","Térmica a gas")+kv(fmt((o.hy+o.rn)/o.E*100,0)+" %","Hidro y renovables")+kv(fmt(o.E)+" TWh","Demanda eléctrica")+kv(p2||"> 2040","Primer año de estrés (≥ 2 %)",0,!!p2);
+ $("kp-fuel").innerHTML=kv(fmt(o.dCov,0)+" %","Diésel abastecido "+YA,sf,o.dCov<99)+kv(fmt(o.gCov,0)+" %","Gasolina abastecida "+YA,sgl,o.gCov<99)+kv("US$ "+fmt(o.billW,0)+" M","Factura energética")+kv(fmt(o.r*100,0)+" %","Factura cubierta por divisas",sx,o.r<0.999)+kv(d90||"> 2040","Primer año de escasez de diésel",0,!!d90);
+ const pr=(n,p,x,c,sub,e)=>`<tr><td>${n}</td><td>${fmt(p,2)}</td><td>${fmt(p/P.tc,2)}</td><td>${fmt(x,2)}</td><td>${fmt(c,2)}</td><td class="${c>x?"neg":""}">${fmt(x-c,2)}</td><td class="${sub>0.5?"neg":""}">${fmt(sub,0)}</td><td>${fmt((e-1)*100,0)} %</td></tr>`;
+ $("prices").innerHTML=`<thead><tr><th>Producto</th><th>Precio interno<br>Bs/L</th><th>En US$<br>US$/L</th><th>Sin IVA<br>Bs/L</th><th>Costo importado<br>Bs/L</th><th>Margen<br>Bs/L</th><th>Subvención ${YA}<br>US$ M</th><th>Efecto en demanda</th></tr></thead><tbody>`+pr("Diésel",P.prD,o.xD,o.cD,o.subD,o.eD)+pr("Gasolina especial",P.prG,o.xG,o.cG,o.subG,o.eG)+"</tbody>";
+ $("pricenote").textContent=o.subD+o.subG>0.5?`A estos precios el Estado aún cubre US$ ${fmt(o.subD+o.subG,0)} M en ${YA} por vender combustible importado por debajo de su costo${o.subG>o.subD?", sobre todo gasolina":""}.`:`A estos precios no hay subvención: el precio interno cubre el costo de importación.`;
+ mark("thr-gas",[[sg[0],"año "+YA]]);
+ mark("thr-power",[[sp[0],"año "+YA]]);
+ mark("thr-fuel",[[sf[0],"diésel"],[sgl[0],"gasolina"]]);
  // table
- const h=["Año","Producción gas","Demanda interna","Export.","Import. gas","Faltante gas","Electr. no servida","Diésel abastecido","Factura import.","Divisas + export."];
- const sub=["","MMm³/d","MMm³/d","MMm³/d","MMm³/d","MMm³/d","%","%","US$ M","US$ M"];
+ const h=["Año","Producción gas","Demanda interna","Export.","Import. gas","Faltante gas","Electr. no servida","Diésel abastecido","Gasolina abastecida","Factura import.","Divisas + export."];
+ const sub=["","MMm³/d","MMm³/d","MMm³/d","MMm³/d","MMm³/d","%","%","%","US$ M","US$ M"];
  $("tbl").innerHTML=`<thead><tr>${h.map((x,i)=>`<th>${x}${sub[i]?"<br>"+sub[i]:""}</th>`).join("")}</tr></thead><tbody>`+
- R.map(x=>`<tr${x.y===YA?' class="cur"':""}><td>${x.y}</td><td>${fmt(x.sup)}</td><td>${fmt(x.dom)}</td><td>${fmt(x.expo)}</td><td>${fmt(x.gImp)}</td><td class="${x.short>0.05?"neg":""}">${fmt(x.short)}</td><td class="${x.uP>0.05?"neg":""}">${fmt(x.uP)}</td><td class="${x.dCov<99?"neg":""}">${fmt(x.dCov,0)}</td><td>${fmt(x.billW,0)}</td><td>${fmt(x.avail,0)}</td></tr>`).join("")+"</tbody>";
- // decision layer
- const imp=$("imp").checked;
- const rows=Object.entries(PRE).map(([k,v])=>[k,model({...DEF,...v},imp)]);
- rows.push(["Escenario actual",R]);
- const score=Rr=>{const a=f=>Rr.reduce((s,x)=>s+f(x),0)/N;return Math.max(0,100-200*(0.4*a(x=>x.short/x.dom)+0.35*a(x=>x.uP/100)+0.25*a(x=>x.fD/x.dD)))};
- const dr=rows.map(([k,Rr])=>({k,s:score(Rr),c:(Rr.find(x=>x.dom>x.sup)||{}).y,u:Math.max(...Rr.map(x=>x.uP)),d:Rr[4].dCov,b:Rr.reduce((s,x)=>s+x.billW,0)/1000})).sort((a,b)=>b.s-a.s);
+ R.map(x=>`<tr${x.y===YA?' class="cur"':""}><td>${x.y}</td><td>${fmt(x.sup)}</td><td>${fmt(x.dom)}</td><td>${fmt(x.expo)}</td><td>${fmt(x.gImp)}</td><td class="${x.short>0.05?"neg":""}">${fmt(x.short)}</td><td class="${x.uP>0.05?"neg":""}">${fmt(x.uP)}</td><td class="${x.dCov<99?"neg":""}">${fmt(x.dCov,0)}</td><td class="${x.gCov<99?"neg":""}">${fmt(x.gCov,0)}</td><td>${fmt(x.billW,0)}</td><td>${fmt(x.avail,0)}</td></tr>`).join("")+"</tbody>";
+ // decision
+ const rows=Object.entries(PRE).map(([k,v])=>[k,model({...DEF,...v},imp)]);rows.push(["Escenario actual",R]);
+ const score=Rr=>{const a=f=>Rr.reduce((s,x)=>s+f(x),0)/N;return Math.max(0,100-200*(0.35*a(x=>x.short/x.dom)+0.30*a(x=>x.uP/100)+0.20*a(x=>x.fD/x.dD)+0.15*a(x=>x.fG/x.dG)))};
+ const dr=rows.map(([k,Rr])=>({k,s:score(Rr),c:(Rr.find(x=>x.dom>x.sup)||{}).y,u:Math.max(...Rr.map(x=>x.uP)),d:Rr[4].dCov,g:Rr[4].gCov,b:Rr.reduce((s,x)=>s+x.billW,0)/1000})).sort((a,b)=>b.s-a.s);
  const q=s=>s>=85?["ok","ALTA"]:s>=70?["warn","MEDIA"]:s>=50?["bad","BAJA"]:["crit","CRÍTICA"];
- $("dec").innerHTML=`<thead><tr><th>#</th><th>Escenario</th><th>Puntaje</th><th>Seguridad</th><th>Año de cruce</th><th>Peor año eléctrico</th><th>Diésel 2030</th><th>Factura acumulada<br>US$ mil M</th></tr></thead><tbody>`+
-  dr.map((x,i)=>`<tr class="rk${x.k==="Escenario actual"?" cur":""}"><td>#${i+1}</td><td>${x.k}</td><td class="score">${fmt(x.s,0)}</td><td>${badge(q(x.s))}</td><td>${x.c||"> 2040"}</td><td class="${x.u>0.05?"neg":""}">${fmt(x.u)} %</td><td class="${x.d<99?"neg":""}">${fmt(x.d,0)} %</td><td>${fmt(x.b,0)}</td></tr>`).join("")+"</tbody>";
+ $("dec").innerHTML=`<thead><tr><th>#</th><th>Escenario</th><th>Puntaje</th><th>Seguridad</th><th>Año de cruce</th><th>Peor año eléctrico</th><th>Diésel 2030</th><th>Gasolina 2030</th><th>Factura acumulada<br>US$ mil M</th></tr></thead><tbody>`+
+  dr.map((x,i)=>`<tr class="rk${x.k==="Escenario actual"?" cur":""}"><td>#${i+1}</td><td>${x.k}</td><td class="score">${fmt(x.s,0)}</td><td>${badge(q(x.s))}</td><td>${x.c||"> 2040"}</td><td class="${x.u>0.05?"neg":""}">${fmt(x.u)} %</td><td class="${x.d<99?"neg":""}">${fmt(x.d,0)} %</td><td class="${x.g<99?"neg":""}">${fmt(x.g,0)} %</td><td>${fmt(x.b,0)}</td></tr>`).join("")+"</tbody>";
 }
 
 function run(){R=model(P,$("imp").checked);render();drawAll();
@@ -607,7 +695,8 @@ const VIEWS={global:"p-global",gas:"p-gas",electricidad:"p-power",combustibles:"
 function route(){const h=location.hash.slice(1)||"global",ab=h==="about",v=VIEWS[h]||"p-global";
  $("v-app").hidden=ab;$("v-about").hidden=!ab;
  Object.values(VIEWS).forEach(id=>$(id).hidden=id!==v);
- document.querySelectorAll("#tabs a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+(ab?"about":(VIEWS[h]?h:"global"))?"page":"false"));
+ const cur=ab?"about":(VIEWS[h]?h:"global");
+ document.querySelectorAll("#tabs a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+cur?"page":"false"));
  if(!ab)drawAll();window.scrollTo(0,0)}
 window.addEventListener("hashchange",route);
 const tick=()=>{$("clock").textContent=new Date().toLocaleTimeString("es-BO",{hour12:false})};tick();setInterval(tick,1000);
